@@ -25,7 +25,7 @@ let package = Package(
                 .product(name: "FacebookLogin", package: "facebook-ios-sdk"),
                 .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS")
             ],
-            exclude: ["Example"]
+            exclude: ["../../Example/"]
         ),
         .testTarget(
             name: "SocialAuthenticationTests",
