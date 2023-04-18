@@ -13,3 +13,20 @@ class SignInWithSocialViewModel: ObservableObject {
         
     }
 }
+
+// MARK: - Inputs
+
+extension SignInWithSocialViewModel {
+    
+    func signInWithFacebookTapped() {
+        print("sign in with facebook...")
+    }
+    
+    func signInWithGoogleTapped() {
+        print("sign in with google...")
+    }
+    
+    func signInWithAppleTapped() {
+        print("sign in with apple...")
+    }
+}
