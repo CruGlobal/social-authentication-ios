@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import FacebookLogin
+import FBSDKLoginKit
 
 public class FacebookAuthentication {
     
