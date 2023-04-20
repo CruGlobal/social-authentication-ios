@@ -6,7 +6,7 @@
 //  Copyright © 2023 Cru Global, Inc. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import FBSDKLoginKit
 import Combine
 
