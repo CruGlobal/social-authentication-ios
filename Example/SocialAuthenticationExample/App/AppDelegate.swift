@@ -8,17 +8,38 @@
 
 import UIKit
 import SwiftUI
+import SocialAuthentication
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     private let navigationController: UINavigationController = UINavigationController()
         
+    private lazy var facebookConfiguration: FacebookConfiguration = {
+        
+        return FacebookConfiguration(
+            appId: "2236701616451487",
+            clientToken: "3b6bf5b7c128a970337c4fa1860ffa6e",
+            displayName: "GodTools",
+            isAutoLogAppEventsEnabled: false,
+            isAdvertiserTrackingEnabled: false,
+            isAdvertiserIDCollectionEnabled: false,
+            isSKAdNetworkReportEnabled: false
+        )
+    }()
+    
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        let viewModel = SignInWithSocialViewModel()
+        let viewModel = SignInWithSocialViewModel(
+            socialAuthPresenter: navigationController,
+            facebookAuthentication: FacebookAuthentication(
+                configuration: FacebookAuthenticationConfiguration(
+                    permissions: ["email"]
+                )
+            )
+        )
         
         let view = SignInWithSocialView(viewModel: viewModel)
         
@@ -26,6 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         hostingView.view.backgroundColor = UIColor.white
         
         navigationController.setViewControllers([hostingView], animated: false)
+        navigationController.modalPresentationStyle = .fullScreen
         
         // window
         let window: UIWindow = UIWindow(frame: UIScreen.main.bounds)
@@ -33,7 +55,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
         self.window = window
-                
+        
+        // Facebook
+        ConfigureFacebookOnAppLaunch.configure(
+            application: application,
+            launchOptions: launchOptions,
+            configuration: facebookConfiguration
+        )
+        
         return true
     }
     
