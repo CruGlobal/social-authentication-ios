@@ -29,14 +29,6 @@ public class FacebookAuthentication: NSObject {
             name: .AccessTokenDidChange,
             object: nil
         )
-        /*
-        AccessToken.refreshCurrentAccessToken(completion: { (connection: GraphRequestConnecting?, result: Any?, error: Error?) in
-            
-            print(connection)
-            print(result)
-            print(error)
-        })*/
-
     }
     
     deinit {
@@ -50,11 +42,7 @@ public class FacebookAuthentication: NSObject {
     }
     
     @objc private func accessTokenDidChange(notification: Notification) {
-        
-        print("Access Token Did Change")
-        
-        print("user info: \(String(describing: notification.userInfo))")
-        
+                
         accessTokenChanged.send(AccessToken.current?.tokenString)
     }
 }
