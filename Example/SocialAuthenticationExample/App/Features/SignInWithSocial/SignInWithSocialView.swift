@@ -36,6 +36,21 @@ struct SignInWithSocialView: View {
                     .multilineTextAlignment(.center)
                     .padding(EdgeInsets(top: 50, leading: 30, bottom: 0, trailing: 30))
                 
+                HStack(alignment: .center, spacing: 10) {
+                    
+                    Text("Facebook has persisted access token: ")
+                        .font(Font.system(size: 17))
+                        .foregroundColor(Color.black)
+                        .multilineTextAlignment(.leading)
+                    
+                    Rectangle()
+                        .fill(viewModel.facebookHasPersistedAccessToken ? Color.green : Color.red)
+                        .frame(width: 15, height: 15)
+                }
+                .padding(EdgeInsets(top: 40, leading: 30, bottom: 0, trailing: 30))
+                
+                
+                
                 Spacer()
                 
                 Button(action: {
