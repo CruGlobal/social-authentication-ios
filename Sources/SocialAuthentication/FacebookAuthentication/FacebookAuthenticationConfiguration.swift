@@ -10,7 +10,10 @@ import Foundation
 
 public class FacebookAuthenticationConfiguration {
     
-    public init() {
+    public let permissions: [String]
+    
+    public init(permissions: [String]) {
         
+        self.permissions = permissions
     }
 }
