@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import FacebookCore
+import FBSDKCoreKit
 
 public class ConfigureFacebookOnAppLaunch {
     
