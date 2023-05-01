@@ -29,4 +29,23 @@ public extension FacebookAuthentication {
         }
         .eraseToAnyPublisher()
     }
+    
+    func refreshCurrentAccessTokenPublisher() -> AnyPublisher<Void, Error> {
+        
+        return Future() { promise in
+                        
+            self.refreshCurrentAccessToken() { (result: Result<Void, Error>) in
+                
+                switch result {
+                    
+                case .success(let response):
+                    promise(.success(response))
+                    
+                case .failure(let error):
+                    promise(.failure(error))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 }

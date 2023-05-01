@@ -52,7 +52,7 @@ public class FacebookAuthentication: NSObject {
 extension FacebookAuthentication {
     
     public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<FacebookAuthenticationResponse, Error>) -> Void)) {
-                
+               
         facebookLoginManager.logIn(permissions: configuration.permissions, from: viewController, handler: { (loginResult: LoginManagerLoginResult?, loginError: Error?) in
             
             if let loginResult = loginResult {
@@ -97,6 +97,19 @@ extension FacebookAuthentication {
     public func getAccessTokenString() -> String? {
         
         return AccessToken.current?.tokenString
+    }
+    
+    public func refreshCurrentAccessToken(completion: @escaping ((_ result: Result<Void, Error>) -> Void)) {
+        
+        AccessToken.refreshCurrentAccessToken(completion: { (connection: GraphRequestConnecting?, result: Any?, error: Error?) in
+            
+            if let error = error {
+                completion(.failure(error))
+            }
+            else {
+                completion(.success(()))
+            }
+        })
     }
 }
 
