@@ -38,7 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 configuration: FacebookAuthenticationConfiguration(
                     permissions: ["email"]
                 )
-            )
+            ), appleAuthentication: AppleAuthentication()
         )
         
         let view = SignInWithSocialView(viewModel: viewModel)

@@ -107,6 +107,34 @@ struct SignInWithSocialView: View {
                 
                 Rectangle()
                     .fill(Color.clear)
+                    .frame(width: 1, height: 15)
+                
+                Button(action: {
+                    
+                    viewModel.signInWithAppleTapped()
+                    
+                }) {
+                    
+                    ZStack(alignment: .center) {
+                        
+                        Rectangle()
+                            .fill(.clear)
+                            .frame(width: buttonWidth, height: buttonHeight)
+                            .cornerRadius(buttonCornerRadius)
+                        
+                        Text("Continue with Apple")
+                            .font(buttonFont)
+                            .foregroundColor(Color.white)
+                            .padding()
+                    }
+                }
+                .frame(width: buttonWidth, height: buttonHeight, alignment: .center)
+                .background(Color.gray)
+                .cornerRadius(buttonCornerRadius)
+                .padding(buttonInsets)
+                
+                Rectangle()
+                    .fill(Color.clear)
                     .frame(width: 1, height: 40)
             }
         }
