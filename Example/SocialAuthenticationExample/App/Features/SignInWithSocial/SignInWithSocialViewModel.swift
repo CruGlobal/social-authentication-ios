@@ -54,6 +54,9 @@ extension SignInWithSocialViewModel {
     
     func signInWithAppleTapped() {
         
-        appleAuthentication.authenticate(from: socialAuthPresenter)
+        appleAuthentication.authenticate { _ in
+            
+            print("finished")
+        }
     }
 }

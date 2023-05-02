@@ -8,10 +8,13 @@
 
 import Foundation
 import AuthenticationServices
+import Combine
 
 public class AppleAuthentication: NSObject {
     
-    private var viewController: UIViewController?
+    public typealias AppleAuthenticationCompletion = ((_ result: Result<AppleAuthenticationResponse, Error>) -> Void)
+    
+    private var completionBlock: AppleAuthenticationCompletion?
     
 }
 
@@ -19,9 +22,8 @@ public class AppleAuthentication: NSObject {
 
 extension AppleAuthentication {
     
-    public func authenticate(from viewController: UIViewController) {
-        
-        self.viewController = viewController
+    public func authenticate(completion: @escaping AppleAuthenticationCompletion) {
+        self.completionBlock = completion
         
         let appleIdProvider = ASAuthorizationAppleIDProvider()
         let request = appleIdProvider.createRequest()
@@ -29,7 +31,7 @@ extension AppleAuthentication {
         
         let authorizationController = ASAuthorizationController(authorizationRequests: [request])
         authorizationController.delegate = self
-        authorizationController.presentationContextProvider = self
+        authorizationController.performRequests()
         
     }
 }
@@ -38,21 +40,22 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
     
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         
-        print("failure")
+        guard let completion = completionBlock else { return }
+        
+        completion(.failure(error))
     }
     
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         
-        // TODO: - something with authorization object
-        print("success")
-    }
-    
-}
-
-extension AppleAuthentication: ASAuthorizationControllerPresentationContextProviding {
-    
-    public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        guard let appleIdCredential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
+        guard let token = appleIdCredential.identityToken?.base64EncodedString() else { return }
+        guard let userId = appleIdCredential.email else { return }
         
-        return viewController!.view.window!
+        guard let completion = completionBlock else { return }
+        
+        let response = AppleAuthenticationResponse(accessToken: token, userId: userId)
+        
+        completion(.success(response))
     }
+    
 }
