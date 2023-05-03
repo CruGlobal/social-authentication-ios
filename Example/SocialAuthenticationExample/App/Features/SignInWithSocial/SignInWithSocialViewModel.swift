@@ -18,6 +18,7 @@ class SignInWithSocialViewModel: ObservableObject {
     private var cancellables: Set<AnyCancellable> = Set()
     
     @Published var facebookHasPersistedAccessToken: Bool = false
+    @Published var appleIsAuthenticated: Bool = false
     
     init(socialAuthPresenter: UIViewController, facebookAuthentication: FacebookAuthentication, appleAuthentication: AppleAuthentication) {
         
@@ -33,6 +34,11 @@ class SignInWithSocialViewModel: ObservableObject {
                 self?.facebookHasPersistedAccessToken = accessTokenExists
             }
             .store(in: &cancellables)
+        
+        appleAuthentication.isAuthenticated { [weak self] isAuthenticated in
+            
+            self?.appleIsAuthenticated = isAuthenticated
+        }
     }
 }
 
