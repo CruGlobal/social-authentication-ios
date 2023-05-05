@@ -85,7 +85,9 @@ extension AppleAuthentication {
         }
     }
     
-    private func storeUserId(_ userId: String) {
+    private func storeUserId(_ userId: String?) {
+        guard let userId = userId else { return }
+        
         let query = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: "appleAuthentication",
@@ -121,17 +123,24 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
     
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         
-        guard let appleIdCredential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
-        guard let token = appleIdCredential.identityToken?.base64EncodedString() else { return }
-        guard let userId = appleIdCredential.email else { return }
-        
         guard let completion = completionBlock else { return }
         
-        let response = AppleAuthenticationResponse(accessToken: token, userId: userId)
+        guard let appleIdCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+            
+            completion(.failure(AppleAuthenticationError.noAuthCredential))
+            return
+        }
+        
+        let response = AppleAuthenticationResponse(
+            authorizationCode: appleIdCredential.authorizationCode?.base64EncodedString(),
+            email: appleIdCredential.email,
+            identityToken: appleIdCredential.identityToken?.base64EncodedString(),
+            userId: appleIdCredential.user
+        )
         
         completion(.success(response))
         
-        storeUserId(userId)
+        storeUserId(appleIdCredential.user)
     }
     
 }
