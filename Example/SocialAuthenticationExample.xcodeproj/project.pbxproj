@@ -144,7 +144,6 @@
 		45613D1229EEFDD8005BF287 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				45613D1829EEFEA0005BF287 /* SignInWithSocial */,
 				45613D1329EEFDD8005BF287 /* AppDelegate.swift */,
 				45613D1729EEFEA0005BF287 /* Features */,
 			);
@@ -154,6 +153,7 @@
 		45613D1729EEFEA0005BF287 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				45613D1829EEFEA0005BF287 /* SignInWithSocial */,
 			);
 			path = Features;
 			sourceTree = "<group>";
