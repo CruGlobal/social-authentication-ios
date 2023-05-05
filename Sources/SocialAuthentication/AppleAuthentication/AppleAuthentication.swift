@@ -12,6 +12,11 @@ import Combine
 
 public class AppleAuthentication: NSObject {
     
+    private enum KeychainKeys: String {
+        case service = "appleAuthentication"
+        case userIdAccount = "userId"
+    }
+    
     public typealias AppleAuthenticationCompletion = ((_ result: Result<AppleAuthenticationResponse, Error>) -> Void)
     
     private var completionBlock: AppleAuthenticationCompletion?
@@ -73,8 +78,8 @@ extension AppleAuthentication {
     public func getUserId() -> String? {
         let query = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "appleAuthentication",
-            kSecAttrAccount as String: "userId",
+            kSecAttrService as String: KeychainKeys.service,
+            kSecAttrAccount as String: KeychainKeys.userIdAccount,
             kSecReturnData as String: true
         ] as CFDictionary
         
@@ -96,18 +101,18 @@ extension AppleAuthentication {
         
         let query = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "appleAuthentication",
-            kSecAttrAccount as String: "userId",
+            kSecAttrService as String: KeychainKeys.service,
+            kSecAttrAccount as String: KeychainKeys.userIdAccount,
             kSecValueData as String: Data(userId.utf8)
         ] as CFDictionary
         
         let status = SecItemAdd(query, nil)
         
         if status == errSecSuccess {
-           print("success")
+           print("Apple Auth UserId store success")
             
         } else if status == errSecDuplicateItem {
-            print("duplicate exists")
+            print("Apple Auth UserId duplicate exists")
             
         } else {
             
@@ -148,5 +153,4 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
         
         storeUserId(appleIdCredential.user)
     }
-    
 }
