@@ -35,25 +35,31 @@ extension AppleAuthentication {
         
     }
     
-    public func isAuthenticated(completion: @escaping ((_ isAuthenticated: Bool) -> Void)) {
+    public func getAuthenticationState(completion: @escaping ((_ authenticationState: AppleAuthenticationState) -> Void)) {
         
         guard let userId = getUserId() else {
-            completion(false)
+            completion(.notFound)
             return
         }
         
         let appleIDProvider = ASAuthorizationAppleIDProvider()
         appleIDProvider.getCredentialState(forUserID: userId) { (credentialState, error) in
             
-            switch credentialState {
+            let authState = AppleAuthenticationState(credentialState: credentialState)
+            completion(authState)
+        }
+    }
+    
+    public func isAuthenticated(completion: @escaping ((_ isAuthenticated: Bool) -> Void)) {
+        
+        getAuthenticationState { authenticationState in
             
+            switch authenticationState {
+                
             case .authorized:
                 completion(true)
                 
-            case .revoked, .notFound, .transferred:
-                completion(false)
-            
-            @unknown default:
+            case .revoked, .notFound, .transferred, .unknown:
                 completion(false)
             }
         }
