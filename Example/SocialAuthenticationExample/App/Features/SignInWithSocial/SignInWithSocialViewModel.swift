@@ -13,15 +13,18 @@ class SignInWithSocialViewModel: ObservableObject {
     
     private let socialAuthPresenter: UIViewController
     private let facebookAuthentication: FacebookAuthentication
+    private let appleAuthentication: AppleAuthentication
     
     private var cancellables: Set<AnyCancellable> = Set()
     
     @Published var facebookHasPersistedAccessToken: Bool = false
+    @Published var appleIsAuthenticated: Bool = false
     
-    init(socialAuthPresenter: UIViewController, facebookAuthentication: FacebookAuthentication) {
+    init(socialAuthPresenter: UIViewController, facebookAuthentication: FacebookAuthentication, appleAuthentication: AppleAuthentication) {
         
         self.socialAuthPresenter = socialAuthPresenter
         self.facebookAuthentication = facebookAuthentication
+        self.appleAuthentication = appleAuthentication
         
         facebookAuthentication.accessTokenChangedPublisher
             .receive(on: DispatchQueue.main)
@@ -31,6 +34,11 @@ class SignInWithSocialViewModel: ObservableObject {
                 self?.facebookHasPersistedAccessToken = accessTokenExists
             }
             .store(in: &cancellables)
+        
+        appleAuthentication.isAuthenticated { [weak self] isAuthenticated in
+            
+            self?.appleIsAuthenticated = isAuthenticated
+        }
     }
 }
 
@@ -51,6 +59,10 @@ extension SignInWithSocialViewModel {
     }
     
     func signInWithAppleTapped() {
-        print("sign in with apple...")
+        
+        appleAuthentication.authenticate { _ in
+            
+            print("finished")
+        }
     }
 }

@@ -49,7 +49,18 @@ struct SignInWithSocialView: View {
                 }
                 .padding(EdgeInsets(top: 40, leading: 30, bottom: 0, trailing: 30))
                 
-                
+                HStack(alignment: .center, spacing: 10) {
+                    
+                    Text("Apple is authenticated: ")
+                        .font(Font.system(size: 17))
+                        .foregroundColor(Color.black)
+                        .multilineTextAlignment(.leading)
+                    
+                    Rectangle()
+                        .fill(viewModel.appleIsAuthenticated ? Color.green : Color.red)
+                        .frame(width: 15, height: 15)
+                }
+                .padding(EdgeInsets(top: 40, leading: 30, bottom: 0, trailing: 30))
                 
                 Spacer()
                 
@@ -95,6 +106,34 @@ struct SignInWithSocialView: View {
                             .cornerRadius(buttonCornerRadius)
                         
                         Text("Sign in with Google")
+                            .font(buttonFont)
+                            .foregroundColor(Color.white)
+                            .padding()
+                    }
+                }
+                .frame(width: buttonWidth, height: buttonHeight, alignment: .center)
+                .background(Color.gray)
+                .cornerRadius(buttonCornerRadius)
+                .padding(buttonInsets)
+                
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(width: 1, height: 15)
+                
+                Button(action: {
+                    
+                    viewModel.signInWithAppleTapped()
+                    
+                }) {
+                    
+                    ZStack(alignment: .center) {
+                        
+                        Rectangle()
+                            .fill(.clear)
+                            .frame(width: buttonWidth, height: buttonHeight)
+                            .cornerRadius(buttonCornerRadius)
+                        
+                        Text("Continue with Apple")
                             .font(buttonFont)
                             .foregroundColor(Color.white)
                             .padding()
