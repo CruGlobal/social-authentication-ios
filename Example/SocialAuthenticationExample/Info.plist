@@ -14,7 +14,16 @@
 				<string>fb2236701616451487</string>
 			</array>
 		</dict>
-		<dict/>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>google_sign_in_reverse_client_id</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.71275134527-st5s63prkvuh46t7ohb1gmhq39qokh78</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>
