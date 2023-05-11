@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		455B4CC42A09705E0006AED5 /* SocialSignInButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455B4CC32A09705E0006AED5 /* SocialSignInButtonsView.swift */; };
+		455B4CC62A0971940006AED5 /* SocialSignInStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455B4CC52A0971940006AED5 /* SocialSignInStatusView.swift */; };
 		4560F19429EEFD4E0002F341 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4560F19329EEFD4E0002F341 /* Assets.xcassets */; };
 		4560F19829EEFD4E0002F341 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4560F19729EEFD4E0002F341 /* Preview Assets.xcassets */; };
 		4560F1A229EEFD4E0002F341 /* SocialAuthenticationExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4560F1A129EEFD4E0002F341 /* SocialAuthenticationExampleTests.swift */; };
@@ -37,6 +39,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		455B4CC32A09705E0006AED5 /* SocialSignInButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialSignInButtonsView.swift; sourceTree = "<group>"; };
+		455B4CC52A0971940006AED5 /* SocialSignInStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialSignInStatusView.swift; sourceTree = "<group>"; };
 		4560F18C29EEFD4D0002F341 /* SocialAuthenticationExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SocialAuthenticationExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4560F19329EEFD4E0002F341 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4560F19529EEFD4E0002F341 /* SocialAuthenticationExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SocialAuthenticationExample.entitlements; sourceTree = "<group>"; };
@@ -80,6 +84,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		455B4CC22A096FD90006AED5 /* Subviews */ = {
+			isa = PBXGroup;
+			children = (
+				455B4CC32A09705E0006AED5 /* SocialSignInButtonsView.swift */,
+				455B4CC52A0971940006AED5 /* SocialSignInStatusView.swift */,
+			);
+			path = Subviews;
+			sourceTree = "<group>";
+		};
 		4560F18329EEFD4D0002F341 = {
 			isa = PBXGroup;
 			children = (
@@ -163,6 +176,7 @@
 			children = (
 				45613D1929EEFEA0005BF287 /* SignInWithSocialView.swift */,
 				45613D1B29EEFED5005BF287 /* SignInWithSocialViewModel.swift */,
+				455B4CC22A096FD90006AED5 /* Subviews */,
 			);
 			path = SignInWithSocial;
 			sourceTree = "<group>";
@@ -324,8 +338,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				45613D1C29EEFED5005BF287 /* SignInWithSocialViewModel.swift in Sources */,
+				455B4CC42A09705E0006AED5 /* SocialSignInButtonsView.swift in Sources */,
 				45613D1429EEFDD8005BF287 /* AppDelegate.swift in Sources */,
 				45613D1A29EEFEA0005BF287 /* SignInWithSocialView.swift in Sources */,
+				455B4CC62A0971940006AED5 /* SocialSignInStatusView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

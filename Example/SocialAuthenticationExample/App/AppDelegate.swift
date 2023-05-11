@@ -38,7 +38,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 configuration: FacebookAuthenticationConfiguration(
                     permissions: ["email"]
                 )
-            ), appleAuthentication: AppleAuthentication()
+            ),
+            appleAuthentication: AppleAuthentication(),
+            googleAuthentication: GoogleAuthentication(
+                configuration: GoogleAuthenticationConfiguration(
+                    clientId: "71275134527-st5s63prkvuh46t7ohb1gmhq39qokh78.apps.googleusercontent.com"
+                )
+            )
         )
         
         let view = SignInWithSocialView(viewModel: viewModel)
