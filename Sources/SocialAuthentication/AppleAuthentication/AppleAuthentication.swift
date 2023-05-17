@@ -32,7 +32,7 @@ extension AppleAuthentication {
         
         let appleIdProvider = ASAuthorizationAppleIDProvider()
         let request = appleIdProvider.createRequest()
-        request.requestedScopes = [.email]
+        request.requestedScopes = [.email, .fullName]
         
         let authorizationController = ASAuthorizationController(authorizationRequests: [request])
         authorizationController.delegate = self
@@ -145,6 +145,7 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
         let response = AppleAuthenticationResponse(
             authorizationCode: appleIdCredential.authorizationCode?.base64EncodedString(),
             email: appleIdCredential.email,
+            fullName: appleIdCredential.fullName,
             identityToken: appleIdCredential.identityToken?.base64EncodedString(),
             userId: appleIdCredential.user
         )

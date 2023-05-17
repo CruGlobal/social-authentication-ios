@@ -12,13 +12,15 @@ public struct AppleAuthenticationResponse {
     
     public let authorizationCode: String?
     public let email: String?
+    public let fullName: PersonNameComponents?
     public let identityToken: String?
     public let userId: String?
     
-    public init(authorizationCode: String?, email: String?, identityToken: String?, userId: String?) {
+    public init(authorizationCode: String?, email: String?, fullName: PersonNameComponents?, identityToken: String?, userId: String?) {
         
         self.authorizationCode = authorizationCode
         self.email = email
+        self.fullName = fullName
         self.identityToken = identityToken
         self.userId = userId
     }
