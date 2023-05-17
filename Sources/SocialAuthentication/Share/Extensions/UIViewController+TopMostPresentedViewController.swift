@@ -1,8 +1,9 @@
 //
 //  UIViewController+TopMostPresentedViewController.swift
-//  
+//  SocialAuthentication
 //
 //  Created by Levi Eggert on 5/17/23.
+//  Copyright © 2023 Cru Global, Inc. All rights reserved.
 //
 
 import UIKit
