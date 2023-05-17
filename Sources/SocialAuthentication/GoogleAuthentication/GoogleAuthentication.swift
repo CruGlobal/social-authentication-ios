@@ -27,7 +27,9 @@ extension GoogleAuthentication {
     
     public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<GoogleAuthenticationResponse, Error>) -> Void)) {
         
-        sharedGoogleSignIn.signIn(withPresenting: viewController, hint: nil, additionalScopes: nil, completion: { [weak self] (result: GIDSignInResult?, signInError: Error?) in
+        let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
+        
+        sharedGoogleSignIn.signIn(withPresenting: authenticateFromViewController, hint: nil, additionalScopes: nil, completion: { [weak self] (result: GIDSignInResult?, signInError: Error?) in
             
             if let signInError = signInError {
                 

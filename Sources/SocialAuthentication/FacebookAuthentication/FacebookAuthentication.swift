@@ -53,7 +53,9 @@ extension FacebookAuthentication {
     
     public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<FacebookAuthenticationResponse, Error>) -> Void)) {
                
-        facebookLoginManager.logIn(permissions: configuration.permissions, from: viewController, handler: { (loginResult: LoginManagerLoginResult?, loginError: Error?) in
+        let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
+        
+        facebookLoginManager.logIn(permissions: configuration.permissions, from: authenticateFromViewController, handler: { (loginResult: LoginManagerLoginResult?, loginError: Error?) in
             
             if let loginResult = loginResult {
                 
