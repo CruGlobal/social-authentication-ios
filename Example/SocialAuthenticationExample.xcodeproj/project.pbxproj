@@ -123,7 +123,6 @@
 				4560F19529EEFD4E0002F341 /* SocialAuthenticationExample.entitlements */,
 				45613D1D29EEFF9F005BF287 /* Info.plist */,
 				45613D1229EEFDD8005BF287 /* App */,
-				45613D2229EF012E005BF287 /* Packages */,
 				4560F19629EEFD4E0002F341 /* Preview Content */,
 			);
 			path = SocialAuthenticationExample;
@@ -179,13 +178,6 @@
 				455B4CC22A096FD90006AED5 /* Subviews */,
 			);
 			path = SignInWithSocial;
-			sourceTree = "<group>";
-		};
-		45613D2229EF012E005BF287 /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Packages;
 			sourceTree = "<group>";
 		};
 		45613D2329EF0147005BF287 /* Packages */ = {
