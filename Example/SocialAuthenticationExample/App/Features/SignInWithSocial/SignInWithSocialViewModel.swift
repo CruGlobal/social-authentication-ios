@@ -21,6 +21,7 @@ class SignInWithSocialViewModel: ObservableObject {
     @Published var facebookHasPersistedAccessToken: Bool = false
     @Published var appleIsAuthenticated: Bool = false
     @Published var googleIsAuthenticated: Bool = false
+    @Published var userName: String = ""
     
     init(socialAuthPresenter: UIViewController, facebookAuthentication: FacebookAuthentication, appleAuthentication: AppleAuthentication, googleAuthentication: GoogleAuthentication) {
         
@@ -63,32 +64,32 @@ extension SignInWithSocialViewModel {
     
     func signInWithFacebookTapped() {
         
-        facebookAuthentication.authenticate(from: socialAuthPresenter) { (result: Result<FacebookAuthenticationResponse, Error>) in
-                        
-            print("finished")
+        facebookAuthentication.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<FacebookAuthenticationResponse, Error>) in
+                                    
+            self?.userName = self?.facebookAuthentication.getCurrentUserProfile()?.name ?? ""
         }
     }
     
     func signInWithGoogleTapped() {
         
-        googleAuthentication.authenticate(from: socialAuthPresenter) { (result: Result<GoogleAuthenticationResponse, Error>) in
+        googleAuthentication.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<GoogleAuthenticationResponse, Error>) in
             
-            switch result {
-                
-            case .success(let response):
-                break
-                
-            case .failure(let error):
-                break
-            }
+            self?.userName = self?.googleAuthentication.getCurrentUserProfile()?.name ?? ""
         }
     }
     
     func signInWithAppleTapped() {
         
-        appleAuthentication.authenticate { _ in
+        appleAuthentication.authenticate { [weak self] (result: Result<AppleAuthenticationResponse, Error>) in
             
-            print("finished")
+            switch result {
+           
+            case .success(let response):
+                self?.userName = response.fullName?.familyName ?? ""
+                
+            case .failure( _):
+                break
+            }
         }
     }
 }
