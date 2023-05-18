@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FBSDKLoginKit
 import Combine
 
 public extension FacebookAuthentication {
@@ -55,5 +56,30 @@ public extension FacebookAuthentication {
         
         return Just(())
             .eraseToAnyPublisher()
+    }
+    
+    func getCurrentUserProfilePublisher() -> AnyPublisher<Profile?, Never> {
+        
+        let profile: Profile? = getCurrentUserProfile()
+        
+        return Just(profile)
+            .eraseToAnyPublisher()
+    }
+    
+    func loadUserProfilePublisher() -> AnyPublisher<Profile?, Error> {
+        
+        return Future() { promise in
+                    
+            Profile.loadCurrentProfile { (profile: Profile?, error: Error?) in
+                
+                if let error = error {
+                    promise(.failure(error))
+                }
+                else {
+                    promise(.success(profile))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
     }
 }

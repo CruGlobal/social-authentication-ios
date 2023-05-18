@@ -76,4 +76,20 @@ public extension GoogleAuthentication {
         return Just(())
             .eraseToAnyPublisher()
     }
+    
+    func getCurrentUserPublisher() -> AnyPublisher<GIDGoogleUser?, Never> {
+        
+        let user: GIDGoogleUser? = getCurrentUser()
+        
+        return Just(user)
+            .eraseToAnyPublisher()
+    }
+    
+    func getCurrentUserProfilePublisher() -> AnyPublisher<GIDProfileData?, Never> {
+        
+        let profile: GIDProfileData? = getCurrentUserProfile()
+        
+        return Just(profile)
+            .eraseToAnyPublisher()
+    }
 }

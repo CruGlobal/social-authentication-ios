@@ -29,6 +29,12 @@ struct SignInWithSocialView: View {
                     .multilineTextAlignment(.center)
                     .padding(EdgeInsets(top: 50, leading: 30, bottom: 0, trailing: 30))
                 
+                Text("User name: \(viewModel.userName)")
+                    .font(Font.system(size: 17))
+                    .foregroundColor(Color.black)
+                    .multilineTextAlignment(.leading)
+                    .padding(EdgeInsets(top: 10, leading: 30, bottom: 0, trailing: 30))
+                
                 SocialSignInStatusView(
                     title: "Facebook has persisted access token: ",
                     isSuccessStatus: viewModel.facebookHasPersistedAccessToken

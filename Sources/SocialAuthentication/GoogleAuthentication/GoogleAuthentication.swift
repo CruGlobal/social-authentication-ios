@@ -19,6 +19,10 @@ public class GoogleAuthentication {
             clientID: configuration.clientId
         )
     }
+    
+    public func getGoogleSignIn() -> GIDSignIn {
+        return sharedGoogleSignIn
+    }
 }
 
 // MARK: - Authenticate
@@ -83,10 +87,6 @@ extension GoogleAuthentication {
 
 extension GoogleAuthentication {
     
-    public func getCurrentUser() -> GIDGoogleUser? {
-        return sharedGoogleSignIn.currentUser
-    }
-    
     public func getPersistedIdTokenString() -> String? {
         return getCurrentUser()?.idToken?.tokenString
     }
@@ -131,5 +131,18 @@ extension GoogleAuthentication {
     public func signOut() {
         
         sharedGoogleSignIn.signOut()
+    }
+}
+
+// MARK:  User
+
+extension GoogleAuthentication {
+    
+    public func getCurrentUser() -> GIDGoogleUser? {
+        return sharedGoogleSignIn.currentUser
+    }
+    
+    public func getCurrentUserProfile() -> GIDProfileData? {
+        return getCurrentUser()?.profile
     }
 }

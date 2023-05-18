@@ -36,6 +36,10 @@ public class FacebookAuthentication: NSObject {
         NotificationCenter.default.removeObserver(self, name: .AccessTokenDidChange, object: nil)
     }
     
+    public func getLoginManager() -> LoginManager {
+        return facebookLoginManager
+    }
+    
     public var accessTokenChangedPublisher: AnyPublisher<String?, Never> {
         return accessTokenChanged
             .eraseToAnyPublisher()
@@ -122,5 +126,19 @@ extension FacebookAuthentication {
     public func signOut() {
         
         facebookLoginManager.logOut()
+    }
+}
+
+// MARK: - User
+
+extension FacebookAuthentication {
+    
+    public func getCurrentUserProfile() -> Profile? {
+        return Profile.current
+    }
+    
+    public func loadUserProfile(completion: @escaping ((_ profile: Profile?, _ error: Error?) -> Void)) {
+        
+        Profile.loadCurrentProfile(completion: completion)
     }
 }
