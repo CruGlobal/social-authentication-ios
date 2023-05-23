@@ -12,11 +12,6 @@ import Combine
 
 public class AppleAuthentication: NSObject {
     
-    private enum KeychainKeys: String {
-        case service = "appleAuthentication"
-        case userIdAccount = "userId"
-    }
-    
     public typealias AppleAuthenticationCompletion = ((_ result: Result<AppleAuthenticationResponse, Error>) -> Void)
     
     private var completionBlock: AppleAuthenticationCompletion?
@@ -71,6 +66,16 @@ extension AppleAuthentication {
     }
 }
 
+// MARK: - Sign Out
+
+extension AppleAuthentication {
+    
+    public func signOut() {
+        
+        deletePersistedUser()
+    }
+}
+
 // MARK: - User
 
 extension AppleAuthentication {
@@ -83,13 +88,19 @@ extension AppleAuthentication {
             givenName: getUserFamilyName()
         )
     }
+    
+    private func deletePersistedUser() {
+        
+        deleteUserDefaults()
+        deleteKeychainItems()
+    }
 }
 
 // MARK: - UserDefaults Storage
 
 extension AppleAuthentication {
     
-    private enum UserDefaultKey: String {
+    private enum UserDefaultKey: String, CaseIterable {
         case appleUserEmail
         case appleUserFamilyName
         case appleUserGivenName
@@ -112,11 +123,23 @@ extension AppleAuthentication {
         userDefaults.set(familyName, forKey: UserDefaultKey.appleUserFamilyName.rawValue)
         userDefaults.set(givenName, forKey: UserDefaultKey.appleUserGivenName.rawValue)
     }
+    
+    private func deleteUserDefaults() {
+        
+        for userDefaultkey in UserDefaultKey.allCases {
+            userDefaults.removeObject(forKey: userDefaultkey.rawValue)
+        }
+    }
 }
 
 // MARK: - Keychain Storage
 
 extension AppleAuthentication {
+    
+    private enum KeychainKeys: String {
+        case service = "appleAuthentication"
+        case userIdAccount = "userId"
+    }
     
     public func getUserId() -> String? {
         let query = [
@@ -163,6 +186,28 @@ extension AppleAuthentication {
             
             assertionFailure("error storing userId in keychain: \(error.code)")
         }
+    }
+    
+    private func deleteUserId() {
+        
+        let query = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: KeychainKeys.service,
+            kSecAttrAccount as String: KeychainKeys.userIdAccount
+        ] as CFDictionary
+        
+        let status = SecItemDelete(query)
+        
+        if status != errSecSuccess || status != errSecItemNotFound {
+            
+            let error = NSError(domain: NSOSStatusErrorDomain, code: Int(status))
+            
+            assertionFailure("error removing userId from keychain: \(error.code)")
+        }
+    }
+    
+    private func deleteKeychainItems() {
+        deleteUserId()
     }
 }
 

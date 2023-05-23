@@ -53,4 +53,12 @@ public extension AppleAuthentication {
         }
         .eraseToAnyPublisher()
     }
+    
+    func signOutPublisher() -> AnyPublisher<Void, Never> {
+        
+        signOut()
+        
+        return Just(())
+            .eraseToAnyPublisher()
+    }
 }
