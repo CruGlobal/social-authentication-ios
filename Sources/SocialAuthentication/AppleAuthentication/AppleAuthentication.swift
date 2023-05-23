@@ -20,7 +20,7 @@ public class AppleAuthentication: NSObject {
     public typealias AppleAuthenticationCompletion = ((_ result: Result<AppleAuthenticationResponse, Error>) -> Void)
     
     private var completionBlock: AppleAuthenticationCompletion?
-    
+    private let userDefaults: UserDefaults = UserDefaults.standard
 }
 
 // MARK: - Authentication
@@ -71,7 +71,50 @@ extension AppleAuthentication {
     }
 }
 
-// MARK: - UserId
+// MARK: - User
+
+extension AppleAuthentication {
+    
+    public func getCurrentUser() -> AppleCurrentUser? {
+        
+        return AppleCurrentUser(
+            email: getUserEmail(),
+            familyName: getUserFamilyName(),
+            givenName: getUserFamilyName()
+        )
+    }
+}
+
+// MARK: - UserDefaults Storage
+
+extension AppleAuthentication {
+    
+    private enum UserDefaultKey: String {
+        case appleUserEmail
+        case appleUserFamilyName
+        case appleUserGivenName
+    }
+    
+    private func getUserEmail() -> String? {
+        return userDefaults.string(forKey: UserDefaultKey.appleUserEmail.rawValue)
+    }
+    
+    private func getUserFamilyName() -> String? {
+        return userDefaults.string(forKey: UserDefaultKey.appleUserFamilyName.rawValue)
+    }
+    
+    private func getUserGivenName() -> String? {
+        return userDefaults.string(forKey: UserDefaultKey.appleUserGivenName.rawValue)
+    }
+    
+    private func storeUserInfo(email: String?, familyName: String?, givenName: String?) {
+        userDefaults.set(email, forKey: UserDefaultKey.appleUserEmail.rawValue)
+        userDefaults.set(familyName, forKey: UserDefaultKey.appleUserFamilyName.rawValue)
+        userDefaults.set(givenName, forKey: UserDefaultKey.appleUserGivenName.rawValue)
+    }
+}
+
+// MARK: - Keychain Storage
 
 extension AppleAuthentication {
     
@@ -123,6 +166,8 @@ extension AppleAuthentication {
     }
 }
 
+// MARK: - ASAuthorizationControllerDelegate
+
 extension AppleAuthentication: ASAuthorizationControllerDelegate {
     
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
@@ -142,16 +187,21 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
             return
         }
         
+        let email = appleIdCredential.email
+        let fullName = appleIdCredential.fullName
+        let userId = appleIdCredential.user
+        
         let response = AppleAuthenticationResponse(
             authorizationCode: appleIdCredential.authorizationCode?.base64EncodedString(),
-            email: appleIdCredential.email,
-            fullName: appleIdCredential.fullName,
+            email: email,
+            fullName: fullName,
             identityToken: appleIdCredential.identityToken?.base64EncodedString(),
-            userId: appleIdCredential.user
+            userId: userId
         )
         
         completion(.success(response))
         
-        storeUserId(appleIdCredential.user)
+        storeUserInfo(email: email, familyName: fullName?.familyName, givenName: fullName?.givenName)
+        storeUserId(userId)
     }
 }
