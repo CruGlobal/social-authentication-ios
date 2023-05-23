@@ -1,5 +1,5 @@
 //
-//  AppleCurrentUser.swift
+//  AppleUserProfile.swift
 //  
 //
 //  Created by Rachael Skeath on 5/23/23.
@@ -7,9 +7,9 @@
 
 import Foundation
 
-public struct AppleCurrentUser {
+public struct AppleUserProfile {
     
-    let email: String?
-    let familyName: String?
-    let givenName: String?
+    let email: String
+    let familyName: String
+    let givenName: String
 }

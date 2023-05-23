@@ -80,12 +80,20 @@ extension AppleAuthentication {
 
 extension AppleAuthentication {
     
-    public func getCurrentUser() -> AppleCurrentUser? {
+    public func getCurrentUserProfile() -> AppleUserProfile? {
         
-        return AppleCurrentUser(
-            email: getUserEmail(),
-            familyName: getUserFamilyName(),
-            givenName: getUserFamilyName()
+        guard
+            let email = getUserEmail(),
+            let familyName = getUserFamilyName(),
+            let givenName = getUserGivenName()
+        else {
+            return nil
+        }
+        
+        return AppleUserProfile(
+            email: email,
+            familyName: familyName,
+            givenName: givenName
         )
     }
     
