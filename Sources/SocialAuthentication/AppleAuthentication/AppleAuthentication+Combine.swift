@@ -54,9 +54,9 @@ public extension AppleAuthentication {
         .eraseToAnyPublisher()
     }
     
-    func getCurrentUserProfilePublisher() -> AnyPublisher<AppleUserProfile?, Never> {
+    func getCurrentUserProfilePublisher() -> AnyPublisher<AppleUserProfile, Never> {
         
-        let profile: AppleUserProfile? = getCurrentUserProfile()
+        let profile: AppleUserProfile = getCurrentUserProfile()
         
         return Just(profile)
             .eraseToAnyPublisher()

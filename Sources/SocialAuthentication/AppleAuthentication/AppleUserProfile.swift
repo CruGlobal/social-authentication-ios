@@ -9,7 +9,7 @@ import Foundation
 
 public struct AppleUserProfile {
     
-    let email: String
-    let familyName: String
-    let givenName: String
+    let email: String?
+    let familyName: String?
+    let givenName: String?
 }
