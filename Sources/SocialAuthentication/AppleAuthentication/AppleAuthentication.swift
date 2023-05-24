@@ -15,7 +15,13 @@ public class AppleAuthentication: NSObject {
     public typealias AppleAuthenticationCompletion = ((_ result: Result<AppleAuthenticationResponse, Error>) -> Void)
     
     private var completionBlock: AppleAuthenticationCompletion?
-    private let userDefaults: UserDefaults = UserDefaults.standard
+    
+    private let appleUserPersistentStore: AppleUserPersistentStore
+    
+    public init(appleUserPersistentStore: AppleUserPersistentStore) {
+        
+        self.appleUserPersistentStore = appleUserPersistentStore
+    }
 }
 
 // MARK: - Authentication
@@ -37,7 +43,7 @@ extension AppleAuthentication {
     
     public func getAuthenticationState(completion: @escaping ((_ authenticationState: AppleAuthenticationState) -> Void)) {
         
-        guard let userId = getUserId() else {
+        guard let userId = appleUserPersistentStore.getUserId() else {
             completion(.notFound)
             return
         }
@@ -72,7 +78,7 @@ extension AppleAuthentication {
     
     public func signOut() {
         
-        deletePersistedUser()
+        appleUserPersistentStore.deletePersistedUser()
     }
 }
 
@@ -82,132 +88,7 @@ extension AppleAuthentication {
     
     public func getCurrentUserProfile() -> AppleUserProfile {
         
-        return AppleUserProfile(
-            email: getUserEmail(),
-            familyName: getUserFamilyName(),
-            givenName: getUserGivenName()
-        )
-    }
-    
-    private func deletePersistedUser() {
-        
-        deleteUserDefaults()
-        deleteKeychainItems()
-    }
-}
-
-// MARK: - UserDefaults Storage
-
-extension AppleAuthentication {
-    
-    private enum UserDefaultKey: String, CaseIterable {
-        case appleUserEmail
-        case appleUserFamilyName
-        case appleUserGivenName
-    }
-    
-    private func getUserEmail() -> String? {
-        return userDefaults.string(forKey: UserDefaultKey.appleUserEmail.rawValue)
-    }
-    
-    private func getUserFamilyName() -> String? {
-        return userDefaults.string(forKey: UserDefaultKey.appleUserFamilyName.rawValue)
-    }
-    
-    private func getUserGivenName() -> String? {
-        return userDefaults.string(forKey: UserDefaultKey.appleUserGivenName.rawValue)
-    }
-    
-    private func storeUserInfo(email: String?, familyName: String?, givenName: String?) {
-        userDefaults.set(email, forKey: UserDefaultKey.appleUserEmail.rawValue)
-        userDefaults.set(familyName, forKey: UserDefaultKey.appleUserFamilyName.rawValue)
-        userDefaults.set(givenName, forKey: UserDefaultKey.appleUserGivenName.rawValue)
-    }
-    
-    private func deleteUserDefaults() {
-        
-        for userDefaultkey in UserDefaultKey.allCases {
-            userDefaults.removeObject(forKey: userDefaultkey.rawValue)
-        }
-    }
-}
-
-// MARK: - Keychain Storage
-
-extension AppleAuthentication {
-    
-    private enum KeychainKeys: String {
-        case service = "appleAuthentication"
-        case userIdAccount = "userId"
-    }
-    
-    public func getUserId() -> String? {
-        let query = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: KeychainKeys.service,
-            kSecAttrAccount as String: KeychainKeys.userIdAccount,
-            kSecReturnData as String: true
-        ] as CFDictionary
-        
-        var getResult: AnyObject?
-        let status = SecItemCopyMatching(query, &getResult)
-        
-        if status == errSecSuccess {
-            
-            guard let resultData = getResult as? Data else { return nil }
-            return String(data: resultData, encoding: .utf8)
-            
-        } else {
-            return nil
-        }
-    }
-    
-    private func storeUserId(_ userId: String?) {
-        guard let userId = userId else { return }
-        
-        let query = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: KeychainKeys.service,
-            kSecAttrAccount as String: KeychainKeys.userIdAccount,
-            kSecValueData as String: Data(userId.utf8)
-        ] as CFDictionary
-        
-        let status = SecItemAdd(query, nil)
-        
-        if status == errSecSuccess {
-           print("Apple Auth UserId store success")
-            
-        } else if status == errSecDuplicateItem {
-            print("Apple Auth UserId duplicate exists")
-            
-        } else {
-            
-            let error = NSError(domain: NSOSStatusErrorDomain, code: Int(status))
-            
-            assertionFailure("error storing userId in keychain: \(error.code)")
-        }
-    }
-    
-    private func deleteUserId() {
-        
-        let query = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: KeychainKeys.service,
-            kSecAttrAccount as String: KeychainKeys.userIdAccount
-        ] as CFDictionary
-        
-        let status = SecItemDelete(query)
-        
-        if status != errSecSuccess || status != errSecItemNotFound {
-            
-            let error = NSError(domain: NSOSStatusErrorDomain, code: Int(status))
-            
-            assertionFailure("error removing userId from keychain: \(error.code)")
-        }
-    }
-    
-    private func deleteKeychainItems() {
-        deleteUserId()
+        appleUserPersistentStore.getCurrentUserProfile()
     }
 }
 
@@ -246,7 +127,7 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
         
         completion(.success(response))
         
-        storeUserInfo(email: email, familyName: fullName?.familyName, givenName: fullName?.givenName)
-        storeUserId(userId)
+        appleUserPersistentStore.storeUserInfo(email: email, familyName: fullName?.familyName, givenName: fullName?.givenName)
+        appleUserPersistentStore.storeUserId(userId)
     }
 }
