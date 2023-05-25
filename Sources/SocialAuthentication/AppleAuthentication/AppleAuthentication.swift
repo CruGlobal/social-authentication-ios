@@ -12,15 +12,16 @@ import Combine
 
 public class AppleAuthentication: NSObject {
     
-    private enum KeychainKeys: String {
-        case service = "appleAuthentication"
-        case userIdAccount = "userId"
-    }
-    
     public typealias AppleAuthenticationCompletion = ((_ result: Result<AppleAuthenticationResponse, Error>) -> Void)
     
     private var completionBlock: AppleAuthenticationCompletion?
     
+    private let appleUserPersistentStore: AppleUserPersistentStore
+    
+    public init(appleUserPersistentStore: AppleUserPersistentStore) {
+        
+        self.appleUserPersistentStore = appleUserPersistentStore
+    }
 }
 
 // MARK: - Authentication
@@ -42,7 +43,7 @@ extension AppleAuthentication {
     
     public func getAuthenticationState(completion: @escaping ((_ authenticationState: AppleAuthenticationState) -> Void)) {
         
-        guard let userId = getUserId() else {
+        guard let userId = appleUserPersistentStore.getUserId() else {
             completion(.notFound)
             return
         }
@@ -71,57 +72,27 @@ extension AppleAuthentication {
     }
 }
 
-// MARK: - UserId
+// MARK: - Sign Out
 
 extension AppleAuthentication {
     
-    public func getUserId() -> String? {
-        let query = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: KeychainKeys.service,
-            kSecAttrAccount as String: KeychainKeys.userIdAccount,
-            kSecReturnData as String: true
-        ] as CFDictionary
+    public func signOut() {
         
-        var getResult: AnyObject?
-        let status = SecItemCopyMatching(query, &getResult)
-        
-        if status == errSecSuccess {
-            
-            guard let resultData = getResult as? Data else { return nil }
-            return String(data: resultData, encoding: .utf8)
-            
-        } else {
-            return nil
-        }
-    }
-    
-    private func storeUserId(_ userId: String?) {
-        guard let userId = userId else { return }
-        
-        let query = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: KeychainKeys.service,
-            kSecAttrAccount as String: KeychainKeys.userIdAccount,
-            kSecValueData as String: Data(userId.utf8)
-        ] as CFDictionary
-        
-        let status = SecItemAdd(query, nil)
-        
-        if status == errSecSuccess {
-           print("Apple Auth UserId store success")
-            
-        } else if status == errSecDuplicateItem {
-            print("Apple Auth UserId duplicate exists")
-            
-        } else {
-            
-            let error = NSError(domain: NSOSStatusErrorDomain, code: Int(status))
-            
-            assertionFailure("error storing userId in keychain: \(error.code)")
-        }
+        appleUserPersistentStore.deletePersistedUser()
     }
 }
+
+// MARK: - User
+
+extension AppleAuthentication {
+    
+    public func getCurrentUserProfile() -> AppleUserProfile {
+        
+        appleUserPersistentStore.getCurrentUserProfile()
+    }
+}
+
+// MARK: - ASAuthorizationControllerDelegate
 
 extension AppleAuthentication: ASAuthorizationControllerDelegate {
     
@@ -142,16 +113,21 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
             return
         }
         
+        let email = appleIdCredential.email
+        let fullName = appleIdCredential.fullName
+        let userId = appleIdCredential.user
+        
         let response = AppleAuthenticationResponse(
             authorizationCode: appleIdCredential.authorizationCode?.base64EncodedString(),
-            email: appleIdCredential.email,
-            fullName: appleIdCredential.fullName,
+            email: email,
+            fullName: fullName,
             identityToken: appleIdCredential.identityToken?.base64EncodedString(),
-            userId: appleIdCredential.user
+            userId: userId
         )
         
         completion(.success(response))
         
-        storeUserId(appleIdCredential.user)
+        appleUserPersistentStore.storeUserInfo(email: email, familyName: fullName?.familyName, givenName: fullName?.givenName)
+        appleUserPersistentStore.storeUserId(userId)
     }
 }
