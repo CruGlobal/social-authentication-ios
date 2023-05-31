@@ -8,7 +8,7 @@ import Foundation
 
 public struct AppleUserProfile {
     
-    let email: String?
-    let familyName: String?
-    let givenName: String?
+    public let email: String?
+    public let familyName: String?
+    public let givenName: String?
 }
