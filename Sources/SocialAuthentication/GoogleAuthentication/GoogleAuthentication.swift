@@ -14,9 +14,12 @@ public class GoogleAuthentication {
     private let sharedGoogleSignIn: GIDSignIn = GIDSignIn.sharedInstance
     
     public init(configuration: GoogleAuthenticationConfiguration) {
-        
+                
         sharedGoogleSignIn.configuration = GIDConfiguration.init(
-            clientID: configuration.clientId
+            clientID: configuration.clientId,
+            serverClientID: configuration.serverClientId,
+            hostedDomain: configuration.hostedDomain,
+            openIDRealm: configuration.openIDRealm
         )
     }
     
