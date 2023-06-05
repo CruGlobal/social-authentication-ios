@@ -44,7 +44,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ),
             googleAuthentication: GoogleAuthentication(
                 configuration: GoogleAuthenticationConfiguration(
-                    clientId: "71275134527-st5s63prkvuh46t7ohb1gmhq39qokh78.apps.googleusercontent.com"
+                    clientId: "71275134527-st5s63prkvuh46t7ohb1gmhq39qokh78.apps.googleusercontent.com",
+                    serverClientId: nil,
+                    hostedDomain: nil,
+                    openIDRealm: nil
                 )
             )
         )
