@@ -118,10 +118,10 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
         let userId = appleIdCredential.user
         
         let response = AppleAuthenticationResponse(
-            authorizationCode: appleIdCredential.authorizationCode?.base64EncodedString(),
+            authorizationCode: appleIdCredential.getAuthorizationCodeString(),
             email: email,
             fullName: fullName,
-            identityToken: appleIdCredential.identityToken?.base64EncodedString(),
+            identityToken: appleIdCredential.getIdentityTokenString(),
             userId: userId
         )
         
