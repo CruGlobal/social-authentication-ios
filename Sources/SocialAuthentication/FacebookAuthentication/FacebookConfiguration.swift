@@ -14,17 +14,15 @@ public class FacebookConfiguration {
     public let clientToken: String
     public let displayName: String
     public let isAutoLogAppEventsEnabled: Bool
-    public let isAdvertiserTrackingEnabled: Bool
     public let isAdvertiserIDCollectionEnabled: Bool
     public let isSKAdNetworkReportEnabled: Bool
     
-    public init(appId: String, clientToken: String, displayName: String, isAutoLogAppEventsEnabled: Bool, isAdvertiserTrackingEnabled: Bool, isAdvertiserIDCollectionEnabled: Bool, isSKAdNetworkReportEnabled: Bool) {
+    public init(appId: String, clientToken: String, displayName: String, isAutoLogAppEventsEnabled: Bool, isAdvertiserIDCollectionEnabled: Bool, isSKAdNetworkReportEnabled: Bool) {
         
         self.appId = appId
         self.clientToken = clientToken
         self.displayName = displayName
         self.isAutoLogAppEventsEnabled = isAutoLogAppEventsEnabled
-        self.isAdvertiserTrackingEnabled = isAdvertiserTrackingEnabled
         self.isAdvertiserIDCollectionEnabled = isAdvertiserIDCollectionEnabled
         self.isSKAdNetworkReportEnabled = isSKAdNetworkReportEnabled
     }

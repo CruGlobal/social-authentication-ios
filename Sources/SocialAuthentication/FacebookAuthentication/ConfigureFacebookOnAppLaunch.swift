@@ -17,7 +17,6 @@ public class ConfigureFacebookOnAppLaunch {
         Settings.shared.appID = configuration.appId
         Settings.shared.displayName = configuration.displayName
         Settings.shared.isAutoLogAppEventsEnabled = configuration.isAutoLogAppEventsEnabled
-        Settings.shared.isAdvertiserTrackingEnabled = configuration.isAdvertiserTrackingEnabled
         Settings.shared.isAdvertiserIDCollectionEnabled = configuration.isAdvertiserIDCollectionEnabled
         Settings.shared.isSKAdNetworkReportEnabled = configuration.isSKAdNetworkReportEnabled
         

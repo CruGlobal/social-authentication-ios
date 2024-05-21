@@ -74,6 +74,15 @@ extension SignInWithSocialViewModel {
         
         googleAuthentication.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<GoogleAuthenticationResponse, Error>) in
             
+            switch result {
+                
+            case .success(let response):
+                self?.googleIsAuthenticated = response.idToken != nil
+                
+            case .failure(let error):
+                print(error)
+            }
+            
             self?.userName = self?.googleAuthentication.getCurrentUserProfile()?.name ?? ""
         }
     }
