@@ -40,7 +40,14 @@ extension GoogleAuthentication {
             
             if let signInError = signInError {
                 
-                completion(.failure(signInError))
+                let googleSignInErrorCode: Int = (signInError as NSError).code
+                                
+                if googleSignInErrorCode == GIDSignInError.canceled.rawValue {
+                    completion(.success(GoogleAuthenticationResponse(idToken: nil, isCancelled: true)))
+                }
+                else {
+                    completion(.failure(signInError))
+                }
             }
             else if let authenticatedUser = result?.user {
                 
