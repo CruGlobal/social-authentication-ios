@@ -25,7 +25,8 @@ let package = Package(
                 .product(name: "FacebookLogin", package: "facebook-ios-sdk"),
                 .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS")
             ],
-            exclude: ["../../Example"]
+            exclude: ["../../Example"],
+            resources: [.copy("../../Sources/Resources/PrivacyManifest/PrivacyInfo.xcprivacy")]
         ),
         .testTarget(
             name: "SocialAuthenticationTests",
