@@ -12,6 +12,7 @@ import GoogleSignIn
 public struct GoogleAuthenticationResponse {
     
     public let idToken: String?
+    public let isCancelled: Bool
 }
 
 extension GoogleAuthenticationResponse {
@@ -19,14 +20,16 @@ extension GoogleAuthenticationResponse {
     public static func fromGoogleSignInUser(user: GIDGoogleUser) -> GoogleAuthenticationResponse {
         
         return GoogleAuthenticationResponse(
-            idToken: user.idToken?.tokenString
+            idToken: user.idToken?.tokenString,
+            isCancelled: false
         )
     }
     
-    public static func emptyResponse() -> GoogleAuthenticationResponse {
+    public static func emptyResponse(isCancelled: Bool = false) -> GoogleAuthenticationResponse {
         
         return GoogleAuthenticationResponse(
-            idToken: nil
+            idToken: nil,
+            isCancelled: isCancelled
         )
     }
 }

@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
     s.name             = 'SocialAuthentication'
-    s.version          = '0.4.2'
+    s.version          = '0.5.0'
     s.summary          = 'Module for obtaining access tokens from social platforms FacebookLogin, GoogleSignIn, and AppleSignIn.'
   
   

@@ -100,7 +100,16 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
         
         guard let completion = completionBlock else { return }
         
-        completion(.failure(error))
+        let errorCode: Int = (error as NSError).code
+        
+        if errorCode == ASAuthorizationError.canceled.rawValue || errorCode == ASAuthorizationError.unknown.rawValue {
+            
+            completion(.success(AppleAuthenticationResponse.userCancelledResponse()))
+        }
+        else {
+            
+            completion(.failure(error))
+        }
     }
     
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
@@ -122,6 +131,7 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
             email: email,
             fullName: fullName,
             identityToken: appleIdCredential.getIdentityTokenString(),
+            isCancelled: false,
             userId: userId
         )
         
