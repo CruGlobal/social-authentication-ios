@@ -14,7 +14,7 @@ jobs:
 
   lint_ios_podspec:
     name: Lint iOS Podspec
-    runs-on: macos-14
+    runs-on: macos-15
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main')
     steps:
       - name: Checkout code
@@ -84,7 +84,7 @@ jobs:
 
   push_podspec:
     name: Push Podspec
-    runs-on: macos-14
+    runs-on: macos-15
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main')
     needs: [ check_version, tag_version ]
     steps:

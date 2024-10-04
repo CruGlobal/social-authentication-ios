@@ -13,7 +13,7 @@ concurrency:
 jobs:
   lint_ios_podspec:
     name: Lint iOS Podspec
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
