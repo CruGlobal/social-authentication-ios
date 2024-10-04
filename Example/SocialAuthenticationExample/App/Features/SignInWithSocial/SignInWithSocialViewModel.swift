@@ -65,7 +65,14 @@ extension SignInWithSocialViewModel {
     func signInWithFacebookTapped() {
         
         facebookAuthentication.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<FacebookAuthenticationResponse, Error>) in
-                                    
+            
+            switch result {
+            case .success(let response):
+                print(response.accessToken ?? "x")
+            case .failure(let error):
+                break
+            }
+            
             self?.userName = self?.facebookAuthentication.getCurrentUserProfile()?.name ?? ""
         }
     }
