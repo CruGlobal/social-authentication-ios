@@ -13,8 +13,8 @@ let package = Package(
             targets: ["SocialAuthentication"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/facebook/facebook-ios-sdk.git", .upToNextMinor(from: "16.3.1")),
-        .package(url: "https://github.com/google/GoogleSignIn-iOS.git", .upToNextMinor(from: "7.1.0"))
+        .package(url: "https://github.com/facebook/facebook-ios-sdk.git", .upToNextMinor(from: "17.3.0")),
+        .package(url: "https://github.com/google/GoogleSignIn-iOS.git", .upToNextMinor(from: "8.0.0"))
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -25,8 +25,7 @@ let package = Package(
                 .product(name: "FacebookLogin", package: "facebook-ios-sdk"),
                 .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS")
             ],
-            exclude: ["../../Example"],
-            resources: [.copy("../../Sources/Resources/PrivacyManifest/PrivacyInfo.xcprivacy")]
+            exclude: ["../../Example"]
         ),
         .testTarget(
             name: "SocialAuthenticationTests",
