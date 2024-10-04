@@ -14,13 +14,13 @@ jobs:
 
   lint_ios_podspec:
     name: Lint iOS Podspec
-    runs-on: macos-14
-    if: github.event_name == 'pull_request'
+    runs-on: macos-15
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Lint Podspec
-        run: pod lib lint --private --verbose --sources=https://github.com/CruGlobal/cocoapods-specs.git,https://cdn.cocoapods.org/
+      - name: Pod Lib Lint
+        uses: ./.github/actions/pod-lib-lint
 
   current_version:
     name: Store Current Version
@@ -84,7 +84,7 @@ jobs:
 
   push_podspec:
     name: Push Podspec
-    runs-on: macos-14
+    runs-on: macos-15
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main')
     needs: [ check_version, tag_version ]
     steps:

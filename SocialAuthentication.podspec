@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
     s.name = 'SocialAuthentication'
-    s.version = '0.5.0'
+    s.version = '0.6.0'
     s.summary = 'Module for obtaining access tokens from social platforms FacebookLogin, GoogleSignIn, and AppleSignIn.'
     s.description = 'This module implements Classes for obtaining access tokens from FacebookLogin, GoogleSignIn, and AppleSignIn.'
     s.homepage = 'https://github.com/CruGlobal/social-authentication-ios'
@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   
     s.source_files = 'Sources/**/*.{swift}'  
 	
-    s.dependency 'FBSDKLoginKit', '~> 16.0.0'
-    s.dependency 'GoogleSignIn', '~> 7.0.0' 
+    s.dependency 'FBSDKLoginKit', '~> 17.3.0'
+    s.dependency 'GoogleSignIn', '~> 8.0.0' 
   end
   

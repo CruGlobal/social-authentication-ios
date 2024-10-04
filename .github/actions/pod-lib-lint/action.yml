@@ -1,0 +1,11 @@
+name: 'Run Pod Lib Lint'
+description: 'This action contains steps for running pod lib lint against a podspec.'
+runs:
+  using: "composite"
+  steps:
+    - name: Pod Repo Update
+      shell: bash
+      run: pod repo update
+    - name: Lint Podspec
+      shell: bash
+      run: pod lib lint --private --verbose --sources=https://github.com/CruGlobal/cocoapods-specs.git,https://cdn.cocoapods.org/

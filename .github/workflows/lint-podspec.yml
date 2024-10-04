@@ -1,0 +1,21 @@
+name: Lint Podspec
+
+on:
+  push:
+    branches: [ feature/*, versions/* ]
+  pull_request:
+    branches: [ feature/*, versions/* ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint_ios_podspec:
+    name: Lint iOS Podspec
+    runs-on: macos-15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Pod Lib Lint
+        uses: ./.github/actions/pod-lib-lint
