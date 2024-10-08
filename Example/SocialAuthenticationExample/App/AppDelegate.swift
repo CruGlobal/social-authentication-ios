@@ -33,8 +33,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let viewModel = SignInWithSocialViewModel(
             socialAuthPresenter: navigationController,
-            facebookAuthentication: FacebookAuthentication(
-                configuration: FacebookAuthenticationConfiguration(
+            facebookAccessTokenProvider: FacebookAccessTokenProvider(
+                configuration: FacebookAccessTokenProviderConfiguration(
+                    permissions: ["email"]
+                )
+            ),
+            facebookLimitedLogin: FacebookLimitedLogin(
+                configuration: FacebookLimitedLoginConfiguration(
                     permissions: ["email"]
                 )
             ),

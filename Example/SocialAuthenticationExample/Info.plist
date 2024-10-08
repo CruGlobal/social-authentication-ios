@@ -32,5 +32,7 @@
 		<string>fbauth2</string>
 		<string>fbshareextension</string>
 	</array>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>App will need this for Facebook sign in.</string>
 </dict>
 </plist>

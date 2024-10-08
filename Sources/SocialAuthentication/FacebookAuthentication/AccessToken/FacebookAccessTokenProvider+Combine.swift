@@ -1,8 +1,8 @@
 //
-//  FacebookAuthentication+Combine.swift
+//  FacebookAccessTokenProvider+Combine.swift
 //  SocialAuthentication
 //
-//  Created by Levi Eggert on 4/18/23.
+//  Created by Levi Eggert on 10/8/24.
 //  Copyright © 2023 Cru Global, Inc. All rights reserved.
 //
 
@@ -10,13 +10,13 @@ import UIKit
 import FBSDKLoginKit
 import Combine
 
-public extension FacebookAuthentication {
+public extension FacebookAccessTokenProvider {
     
-    func authenticatePublisher(from viewController: UIViewController) -> AnyPublisher<FacebookAuthenticationResponse, Error> {
+    func authenticatePublisher(from viewController: UIViewController) -> AnyPublisher<FacebookAccessTokenProviderResponse, Error> {
                
         return Future() { promise in
                         
-            self.authenticate(from: viewController) { (result: Result<FacebookAuthenticationResponse, Error>) in
+            self.authenticate(from: viewController) { (result: Result<FacebookAccessTokenProviderResponse, Error>) in
                 
                 switch result {
                     
@@ -60,7 +60,7 @@ public extension FacebookAuthentication {
     
     func getCurrentUserProfilePublisher() -> AnyPublisher<Profile?, Never> {
         
-        let profile: Profile? = getCurrentUserProfile()
+        let profile: Profile? = FacebookProfile.current
         
         return Just(profile)
             .eraseToAnyPublisher()

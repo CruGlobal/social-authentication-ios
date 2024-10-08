@@ -12,7 +12,8 @@ import Combine
 class SignInWithSocialViewModel: ObservableObject {
     
     private let socialAuthPresenter: UIViewController
-    private let facebookAuthentication: FacebookAuthentication
+    private let facebookAccessTokenProvider: FacebookAccessTokenProvider
+    private let facebookLimitedLogin: FacebookLimitedLogin
     private let appleAuthentication: AppleAuthentication
     private let googleAuthentication: GoogleAuthentication
     
@@ -23,14 +24,15 @@ class SignInWithSocialViewModel: ObservableObject {
     @Published var googleIsAuthenticated: Bool = false
     @Published var userName: String = ""
     
-    init(socialAuthPresenter: UIViewController, facebookAuthentication: FacebookAuthentication, appleAuthentication: AppleAuthentication, googleAuthentication: GoogleAuthentication) {
+    init(socialAuthPresenter: UIViewController, facebookAccessTokenProvider: FacebookAccessTokenProvider, facebookLimitedLogin: FacebookLimitedLogin, appleAuthentication: AppleAuthentication, googleAuthentication: GoogleAuthentication) {
         
         self.socialAuthPresenter = socialAuthPresenter
-        self.facebookAuthentication = facebookAuthentication
+        self.facebookAccessTokenProvider = facebookAccessTokenProvider
+        self.facebookLimitedLogin = facebookLimitedLogin
         self.appleAuthentication = appleAuthentication
         self.googleAuthentication = googleAuthentication
         
-        facebookAuthentication.accessTokenChangedPublisher
+        facebookAccessTokenProvider.accessTokenChangedPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] (accessToken: String?) in
                 
@@ -62,18 +64,33 @@ class SignInWithSocialViewModel: ObservableObject {
 
 extension SignInWithSocialViewModel {
     
-    func signInWithFacebookTapped() {
+    func signInForFacebookAccessToken() {
         
-        facebookAuthentication.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<FacebookAuthenticationResponse, Error>) in
+        facebookAccessTokenProvider.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<FacebookAccessTokenProviderResponse, Error>) in
             
             switch result {
             case .success(let response):
                 print(response.accessToken ?? "x")
             case .failure(let error):
-                break
+                print(error)
             }
             
-            self?.userName = self?.facebookAuthentication.getCurrentUserProfile()?.name ?? ""
+            self?.userName = FacebookProfile.current?.name ?? ""
+        }
+    }
+    
+    func signInForFacebookLimitedLogin() {
+        
+        facebookLimitedLogin.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<FacebookLimitedLoginResponse, Error>) in
+            
+            switch result {
+            case .success(let response):
+                print(response.oidcToken ?? "x")
+            case .failure(let error):
+                print(error)
+            }
+            
+            self?.userName = FacebookProfile.current?.name ?? ""
         }
     }
     
