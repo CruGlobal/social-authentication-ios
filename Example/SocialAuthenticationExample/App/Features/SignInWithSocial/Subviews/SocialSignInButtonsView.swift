@@ -29,7 +29,7 @@ struct SocialSignInButtonsView: View {
             
             Button(action: {
                 
-                viewModel.signInWithFacebookTapped()
+                viewModel.signInForFacebookAccessToken()
                 
             }) {
                 
@@ -40,7 +40,31 @@ struct SocialSignInButtonsView: View {
                         .frame(width: buttonWidth, height: buttonHeight)
                         .cornerRadius(buttonCornerRadius)
                     
-                    Text("Login with Facebook")
+                    Text("Facebook Access Token Login")
+                        .font(buttonFont)
+                        .foregroundColor(Color.white)
+                        .padding()
+                }
+            }
+            .frame(width: buttonWidth, height: buttonHeight, alignment: .center)
+            .background(Color.gray)
+            .cornerRadius(buttonCornerRadius)
+            .padding(buttonInsets)
+            
+            Button(action: {
+                
+                viewModel.signInForFacebookLimitedLogin()
+                
+            }) {
+                
+                ZStack(alignment: .center) {
+                    
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(width: buttonWidth, height: buttonHeight)
+                        .cornerRadius(buttonCornerRadius)
+                    
+                    Text("Facebook Limited Login")
                         .font(buttonFont)
                         .foregroundColor(Color.white)
                         .padding()
