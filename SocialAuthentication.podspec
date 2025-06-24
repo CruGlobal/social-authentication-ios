@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   
     s.source_files = 'Sources/**/*.{swift}'  
 	
-    s.dependency 'FBSDKLoginKit', '~> 17.3.0'
+    s.dependency 'FBSDKLoginKit', '~> 18.0.0'
     s.dependency 'GoogleSignIn', '~> 8.0.0' 
   end
   
