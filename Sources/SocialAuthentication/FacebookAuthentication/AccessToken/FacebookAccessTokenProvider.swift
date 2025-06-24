@@ -188,3 +188,17 @@ extension FacebookAccessTokenProvider {
         loginManager.logOut()
     }
 }
+
+// MARK: - User
+
+extension FacebookAccessTokenProvider {
+    
+    public func getCurrentUserProfile() -> Profile? {
+        return Profile.current
+    }
+    
+    public func loadUserProfile(completion: @escaping ((_ profile: Profile?, _ error: Error?) -> Void)) {
+        
+        Profile.loadCurrentProfile(completion: completion)
+    }
+}
