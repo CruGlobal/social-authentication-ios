@@ -1,0 +1,38 @@
+//
+//  FacebookProfile+Combine.swift
+//  SocialAuthentication
+//
+//  Created by Levi Eggert on 6/25/25.
+//
+
+import Foundation
+import FBSDKLoginKit
+import Combine
+
+public extension FacebookProfile {
+    
+    func getCurrentUserProfilePublisher() -> AnyPublisher<Profile?, Never> {
+        
+        let profile: Profile? = FacebookProfile.current
+        
+        return Just(profile)
+            .eraseToAnyPublisher()
+    }
+    
+    func loadUserProfilePublisher() -> AnyPublisher<Profile?, Error> {
+        
+        return Future() { promise in
+                    
+            Profile.loadCurrentProfile { (profile: Profile?, error: Error?) in
+                
+                if let error = error {
+                    promise(.failure(error))
+                }
+                else {
+                    promise(.success(profile))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+}

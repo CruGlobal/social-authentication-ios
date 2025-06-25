@@ -57,29 +57,4 @@ public extension FacebookAccessTokenProvider {
         return Just(())
             .eraseToAnyPublisher()
     }
-    
-    func getCurrentUserProfilePublisher() -> AnyPublisher<Profile?, Never> {
-        
-        let profile: Profile? = FacebookProfile.current
-        
-        return Just(profile)
-            .eraseToAnyPublisher()
-    }
-    
-    func loadUserProfilePublisher() -> AnyPublisher<Profile?, Error> {
-        
-        return Future() { promise in
-                    
-            Profile.loadCurrentProfile { (profile: Profile?, error: Error?) in
-                
-                if let error = error {
-                    promise(.failure(error))
-                }
-                else {
-                    promise(.success(profile))
-                }
-            }
-        }
-        .eraseToAnyPublisher()
-    }
 }
