@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "SocialAuthentication",
-    platforms: [.iOS(.v13)],
+    platforms: [.iOS(.v14)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -13,7 +13,7 @@ let package = Package(
             targets: ["SocialAuthentication"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/facebook/facebook-ios-sdk.git", .upToNextMinor(from: "17.3.0")),
+        .package(url: "https://github.com/facebook/facebook-ios-sdk.git", .upToNextMinor(from: "18.0.0")),
         .package(url: "https://github.com/google/GoogleSignIn-iOS.git", .upToNextMinor(from: "8.0.0"))
     ],
     targets: [
