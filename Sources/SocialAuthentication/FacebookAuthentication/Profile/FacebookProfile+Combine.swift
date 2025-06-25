@@ -9,17 +9,20 @@ import Foundation
 import FBSDKLoginKit
 import Combine
 
-public extension FacebookProfile {
+extension FacebookProfile {
     
-    func getCurrentUserProfilePublisher() -> AnyPublisher<Profile?, Never> {
+    public func getCurrentUserProfilePublisher() -> AnyPublisher<Profile?, Error> {
         
-        let profile: Profile? = FacebookProfile.current
-        
-        return Just(profile)
-            .eraseToAnyPublisher()
+        if let profile = FacebookProfile.current {
+            return Just(profile)
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
+            
+        return loadUserProfilePublisher()
     }
     
-    func loadUserProfilePublisher() -> AnyPublisher<Profile?, Error> {
+    private func loadUserProfilePublisher() -> AnyPublisher<Profile?, Error> {
         
         return Future() { promise in
                     
