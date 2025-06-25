@@ -13,11 +13,13 @@ import Foundation
 public struct FacebookLimitedLoginResponse {
     
     public let oidcToken: String?
+    public let nonce: String?
     public let isCancelled: Bool
     
-    public init(oidcToken: String?, isCancelled: Bool) {
+    public init(oidcToken: String?, nonce: String?, isCancelled: Bool) {
         
         self.oidcToken = oidcToken
+        self.nonce = nonce
         self.isCancelled = isCancelled
     }
 }

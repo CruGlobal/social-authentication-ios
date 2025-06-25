@@ -32,11 +32,12 @@ public class FacebookLimitedLogin {
             case .success( _, _, _):
                 
                 let oidcToken: String? = AuthenticationToken.current?.tokenString
+                let nonce: String? = AuthenticationToken.current?.nonce
 
-                completion(.success(FacebookLimitedLoginResponse(oidcToken: oidcToken, isCancelled: false)))
+                completion(.success(FacebookLimitedLoginResponse(oidcToken: oidcToken, nonce: nonce, isCancelled: false)))
             
             case .cancelled:
-                completion(.success(FacebookLimitedLoginResponse(oidcToken: nil, isCancelled: true)))
+                completion(.success(FacebookLimitedLoginResponse(oidcToken: nil, nonce: nil, isCancelled: true)))
             
             case .failed(let error):
                 completion(.failure(error))
