@@ -22,7 +22,7 @@ jobs:
         with:
           xcode-version: '16.3.0'
       - name: Run Tests
-        run: xcodebuild test -scheme SocialAuthentication -sdk iphonesimulator18.0 -destination "OS=18.0,name=iPhone 16"
+        run: xcodebuild test -scheme SocialAuthentication -destination "OS=18.2,name=iPhone 16"
       - name: Upload Xcode Code Coverage Report to CodeCov
         uses: codecov/codecov-action@v4
         with:
