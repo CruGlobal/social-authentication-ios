@@ -46,6 +46,21 @@ public class FacebookLimitedLogin {
     }
 }
 
+// MARK: - OIDC Token
+
+extension FacebookLimitedLogin {
+    
+    public func getAuthenticationToken() -> AuthenticationToken? {
+        
+        return AuthenticationToken.current
+    }
+     
+    public func getAuthenticationTokenString() -> String? {
+        
+        return AuthenticationToken.current?.tokenString
+    }
+}
+
 // MARK: - Sign Out
 
 extension FacebookLimitedLogin {
