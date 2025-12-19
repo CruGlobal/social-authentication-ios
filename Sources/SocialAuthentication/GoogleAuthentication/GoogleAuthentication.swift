@@ -9,7 +9,7 @@
 import UIKit
 import GoogleSignIn
 
-public class GoogleAuthentication {
+public final class GoogleAuthentication {
     
     private let sharedGoogleSignIn: GIDSignIn = GIDSignIn.sharedInstance
     
@@ -32,7 +32,20 @@ public class GoogleAuthentication {
 
 extension GoogleAuthentication {
     
-    public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<GoogleAuthenticationResponse, Error>) -> Void)) {
+    @MainActor public func authenticate(from viewController: UIViewController) async throws -> GoogleAuthenticationResponse {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.authenticate(from: viewController) { (result: Result<GoogleAuthenticationResponse, Error>) in
+                switch result {
+                case .success(let response):
+                    continuation.resume(returning: response)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    @MainActor public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<GoogleAuthenticationResponse, Error>) -> Void)) {
         
         let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
         

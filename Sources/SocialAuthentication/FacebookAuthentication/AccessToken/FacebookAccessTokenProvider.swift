@@ -101,7 +101,7 @@ extension FacebookAccessTokenProvider {
         }
     }
     
-    public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<FacebookAccessTokenProviderResponse, Error>) -> Void)) {
+    @MainActor public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<FacebookAccessTokenProviderResponse, Error>) -> Void)) {
         
         let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
         

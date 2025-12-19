@@ -9,7 +9,7 @@
 import UIKit
 import FBSDKLoginKit
 
-public class FacebookLimitedLogin {
+public final class FacebookLimitedLogin {
     
     private let loginManager: LoginManager = LoginManager()
     private let configuration: FacebookLimitedLoginConfiguration
@@ -19,7 +19,7 @@ public class FacebookLimitedLogin {
         self.configuration = configuration
     }
     
-    public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<FacebookLimitedLoginResponse, Error>) -> Void)) {
+    @MainActor public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<FacebookLimitedLoginResponse, Error>) -> Void)) {
         
         let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
         
