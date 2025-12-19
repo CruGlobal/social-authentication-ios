@@ -9,9 +9,9 @@
 import Foundation
 import Combine
 
-public extension AppleAuthentication {
+extension AppleAuthentication {
     
-    func authenticatePublisher() -> AnyPublisher<AppleAuthenticationResponse, Error> {
+    public func authenticatePublisher() -> AnyPublisher<AppleAuthenticationResponse, Error> {
         
         return Future() { promise in
             
@@ -30,7 +30,7 @@ public extension AppleAuthentication {
         .eraseToAnyPublisher()
     }
     
-    func isAuthenticatedPublisher() -> AnyPublisher<Bool, Never> {
+    public func isAuthenticatedPublisher() -> AnyPublisher<Bool, Never> {
         
         return Future() { promise in
             
@@ -42,7 +42,7 @@ public extension AppleAuthentication {
         .eraseToAnyPublisher()
     }
     
-    func getAuthStatePublisher() -> AnyPublisher<AppleAuthenticationState, Never> {
+    public func getAuthStatePublisher() -> AnyPublisher<AppleAuthenticationState, Never> {
         
         return Future() { promise in
             
@@ -54,7 +54,7 @@ public extension AppleAuthentication {
         .eraseToAnyPublisher()
     }
     
-    func getCurrentUserProfilePublisher() -> AnyPublisher<AppleUserProfile, Never> {
+    public func getCurrentUserProfilePublisher() -> AnyPublisher<AppleUserProfile, Never> {
         
         let profile: AppleUserProfile = getCurrentUserProfile()
         
@@ -62,7 +62,7 @@ public extension AppleAuthentication {
             .eraseToAnyPublisher()
     }
     
-    func signOutPublisher() -> AnyPublisher<Void, Never> {
+    public func signOutPublisher() -> AnyPublisher<Void, Never> {
         
         signOut()
         

@@ -10,9 +10,9 @@ import UIKit
 import FBSDKLoginKit
 import Combine
 
-public extension FacebookLimitedLogin {
+extension FacebookLimitedLogin {
     
-    func authenticatePublisher(from viewController: UIViewController) -> AnyPublisher<FacebookLimitedLoginResponse, Error> {
+    @MainActor public func authenticatePublisher(from viewController: UIViewController) -> AnyPublisher<FacebookLimitedLoginResponse, Error> {
                
         return Future() { promise in
                         
@@ -31,7 +31,7 @@ public extension FacebookLimitedLogin {
         .eraseToAnyPublisher()
     }
     
-    func signOutPublisher() -> AnyPublisher<Void, Never> {
+    public func signOutPublisher() -> AnyPublisher<Void, Never> {
         
         signOut()
         

@@ -10,9 +10,9 @@ import UIKit
 import FBSDKLoginKit
 import Combine
 
-public extension FacebookAccessTokenProvider {
+extension FacebookAccessTokenProvider {
     
-    func authenticatePublisher(from viewController: UIViewController) -> AnyPublisher<FacebookAccessTokenProviderResponse, Error> {
+    @MainActor public func authenticatePublisher(from viewController: UIViewController) -> AnyPublisher<FacebookAccessTokenProviderResponse, Error> {
                
         return Future() { promise in
                         
@@ -31,7 +31,7 @@ public extension FacebookAccessTokenProvider {
         .eraseToAnyPublisher()
     }
     
-    func refreshCurrentAccessTokenPublisher() -> AnyPublisher<Void, Error> {
+    public func refreshCurrentAccessTokenPublisher() -> AnyPublisher<Void, Error> {
         
         return Future() { promise in
                         
@@ -50,7 +50,7 @@ public extension FacebookAccessTokenProvider {
         .eraseToAnyPublisher()
     }
     
-    func signOutPublisher() -> AnyPublisher<Void, Never> {
+    public func signOutPublisher() -> AnyPublisher<Void, Never> {
         
         signOut()
         

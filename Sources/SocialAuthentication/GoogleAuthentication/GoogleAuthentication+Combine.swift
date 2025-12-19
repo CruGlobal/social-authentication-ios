@@ -10,9 +10,9 @@ import UIKit
 import Combine
 import GoogleSignIn
 
-public extension GoogleAuthentication {
+extension GoogleAuthentication {
     
-    func authenticatePublisher(from viewController: UIViewController) -> AnyPublisher<GoogleAuthenticationResponse, Error> {
+    @MainActor public func authenticatePublisher(from viewController: UIViewController) -> AnyPublisher<GoogleAuthenticationResponse, Error> {
                
         return Future() { promise in
                         
@@ -31,7 +31,7 @@ public extension GoogleAuthentication {
         .eraseToAnyPublisher()
     }
     
-    func restorePreviousSignIn() -> AnyPublisher<GoogleAuthenticationResponse, Error> {
+    public func restorePreviousSignIn() -> AnyPublisher<GoogleAuthenticationResponse, Error> {
         
         return Future() { promise in
                   
@@ -50,7 +50,7 @@ public extension GoogleAuthentication {
         .eraseToAnyPublisher()
     }
     
-    func refreshCurrentUserTokensPublisher() -> AnyPublisher<GoogleAuthenticationResponse, Error> {
+    public func refreshCurrentUserTokensPublisher() -> AnyPublisher<GoogleAuthenticationResponse, Error> {
         
         return Future() { promise in
                         
@@ -69,7 +69,7 @@ public extension GoogleAuthentication {
         .eraseToAnyPublisher()
     }
     
-    func signOutPublisher() -> AnyPublisher<Void, Never> {
+    public func signOutPublisher() -> AnyPublisher<Void, Never> {
         
         signOut()
         
@@ -77,7 +77,7 @@ public extension GoogleAuthentication {
             .eraseToAnyPublisher()
     }
     
-    func getCurrentUserPublisher() -> AnyPublisher<GIDGoogleUser?, Never> {
+    public func getCurrentUserPublisher() -> AnyPublisher<GIDGoogleUser?, Never> {
         
         let user: GIDGoogleUser? = getCurrentUser()
         
@@ -85,7 +85,7 @@ public extension GoogleAuthentication {
             .eraseToAnyPublisher()
     }
     
-    func getCurrentUserProfilePublisher() -> AnyPublisher<GIDProfileData?, Never> {
+    public func getCurrentUserProfilePublisher() -> AnyPublisher<GIDProfileData?, Never> {
         
         let profile: GIDProfileData? = getCurrentUserProfile()
         
