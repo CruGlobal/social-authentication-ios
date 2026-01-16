@@ -31,18 +31,17 @@ extension FacebookAccessTokenProvider {
         .eraseToAnyPublisher()
     }
     
-    public func refreshCurrentAccessTokenPublisher() -> AnyPublisher<Void, Error> {
+    @MainActor public func refreshCurrentAccessTokenPublisher() -> AnyPublisher<Void, Error> {
         
         return Future() { promise in
-                        
-            self.refreshCurrentAccessToken() { (result: Result<Void, Error>) in
+            
+            Task {
                 
-                switch result {
-                    
-                case .success(let response):
-                    promise(.success(response))
-                    
-                case .failure(let error):
+                do {
+                    let void: Void = try await self.refreshCurrentAccessToken()
+                    promise(.success(void))
+                }
+                catch let error {
                     promise(.failure(error))
                 }
             }

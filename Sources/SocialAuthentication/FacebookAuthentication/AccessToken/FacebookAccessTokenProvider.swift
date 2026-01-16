@@ -11,7 +11,7 @@ import FBSDKLoginKit
 import Combine
 import AppTrackingTransparency
 
-public class FacebookAccessTokenProvider: NSObject {
+public final class FacebookAccessTokenProvider: NSObject {
     
     private let loginManager: LoginManager = LoginManager()
     private let configuration: FacebookAccessTokenProviderConfiguration
@@ -88,16 +88,22 @@ extension FacebookAccessTokenProvider {
         }
     }
     
-    private func requestTrackingAuthorization(completion: @escaping ((_ status: ATTrackingManager.AuthorizationStatus) -> Void)) {
+    private func requestTrackingAuthorization() async -> ATTrackingManager.AuthorizationStatus {
+        
+        let status: ATTrackingManager.AuthorizationStatus = await ATTrackingManager.requestTrackingAuthorization()
         
         // NOTE: Delay is required before authenticating with Facebook from ViewController.
         //       Otherwise cancelled is triggered by facebook LoginResult. ~Levi
         
-        ATTrackingManager.requestTrackingAuthorization { (status: ATTrackingManager.AuthorizationStatus) in
+        do {
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                completion(status)
-            }
+            try await Task.sleep(for: .seconds(1))
+            
+            return status
+        }
+        catch _ {
+            
+            return status
         }
     }
     
@@ -107,15 +113,13 @@ extension FacebookAccessTokenProvider {
         
         let loginConfiguration = LoginConfiguration(permissions: configuration.permissions, tracking: .enabled)
         
-        requestTrackingAuthorization { [weak self] (status: ATTrackingManager.AuthorizationStatus) in
+        Task {
             
-            guard let weakSelf = self else {
-                return
-            }
+            let status: ATTrackingManager.AuthorizationStatus = await requestTrackingAuthorization()
             
             guard status == .authorized else {
                 
-                let statusString: String = weakSelf.getStatusString(status: status)
+                let statusString: String = getStatusString(status: status)
                 let errorMessage = "FacebookAccessTokenProvider requires that App Tracking Transparency be authorized by the user. Current status is: \(statusString)"
                 let error: Error = NSError(domain: "FacebookAccessTokenProvider", code: 0, userInfo: [NSLocalizedDescriptionKey: errorMessage])
 
@@ -124,7 +128,7 @@ extension FacebookAccessTokenProvider {
                 return
             }
             
-            weakSelf.loginManager.logIn(viewController: authenticateFromViewController, configuration: loginConfiguration) { (result: LoginResult)  in
+            loginManager.logIn(viewController: authenticateFromViewController, configuration: loginConfiguration) { (result: LoginResult)  in
                 
                 switch result {
                 
@@ -165,17 +169,19 @@ extension FacebookAccessTokenProvider {
         return AccessToken.current?.tokenString
     }
     
-    public func refreshCurrentAccessToken(completion: @escaping ((_ result: Result<Void, Error>) -> Void)) {
+    public func refreshCurrentAccessToken() async throws -> Void {
         
-        AccessToken.refreshCurrentAccessToken(completion: { (connection: GraphRequestConnecting?, result: Any?, error: Error?) in
+        return try await withCheckedThrowingContinuation { continuation in
             
-            if let error = error {
-                completion(.failure(error))
-            }
-            else {
-                completion(.success(()))
-            }
-        })
+            AccessToken.refreshCurrentAccessToken(completion: { (connection: GraphRequestConnecting?, result: Any?, error: Error?) in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                }
+                else {
+                    continuation.resume(returning: Void())
+                }
+            })
+        }
     }
 }
 

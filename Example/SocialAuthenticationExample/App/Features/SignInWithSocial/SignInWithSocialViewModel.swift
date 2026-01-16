@@ -9,7 +9,7 @@ import UIKit
 import SocialAuthentication
 import Combine
 
-class SignInWithSocialViewModel: ObservableObject {
+@MainActor class SignInWithSocialViewModel: ObservableObject {
     
     private let socialAuthPresenter: UIViewController
     private let facebookAccessTokenProvider: FacebookAccessTokenProvider

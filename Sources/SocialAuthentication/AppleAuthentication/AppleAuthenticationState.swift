@@ -9,7 +9,7 @@
 import Foundation
 import AuthenticationServices
 
-public enum AppleAuthenticationState {
+public enum AppleAuthenticationState: Sendable {
     
     case authorized
     case revoked

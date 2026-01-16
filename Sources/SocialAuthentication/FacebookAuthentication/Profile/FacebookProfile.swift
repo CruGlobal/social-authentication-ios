@@ -9,7 +9,7 @@
 import Foundation
 import FBSDKLoginKit
 
-public class FacebookProfile {
+public final class FacebookProfile: Sendable {
     
     public init() {
         

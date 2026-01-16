@@ -10,7 +10,7 @@ import Foundation
 import AuthenticationServices
 import Combine
 
-public class AppleAuthentication: NSObject {
+public final class AppleAuthentication: NSObject {
     
     public typealias AppleAuthenticationCompletion = ((_ result: Result<AppleAuthenticationResponse, Error>) -> Void)
     
@@ -29,6 +29,7 @@ public class AppleAuthentication: NSObject {
 extension AppleAuthentication {
     
     public func authenticate(completion: @escaping AppleAuthenticationCompletion) {
+        
         self.completionBlock = completion
         
         let appleIdProvider = ASAuthorizationAppleIDProvider()
@@ -98,7 +99,9 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
     
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         
-        guard let completion = completionBlock else { return }
+        guard let completion = completionBlock else {
+            return
+        }
         
         let errorCode: Int = (error as NSError).code
         
@@ -114,7 +117,9 @@ extension AppleAuthentication: ASAuthorizationControllerDelegate {
     
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         
-        guard let completion = completionBlock else { return }
+        guard let completion = completionBlock else {
+            return
+        }
         
         guard let appleIdCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
             

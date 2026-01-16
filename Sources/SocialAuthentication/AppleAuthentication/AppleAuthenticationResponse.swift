@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct AppleAuthenticationResponse {
+public struct AppleAuthenticationResponse: Sendable {
     
     public let authorizationCode: String?
     public let email: String?

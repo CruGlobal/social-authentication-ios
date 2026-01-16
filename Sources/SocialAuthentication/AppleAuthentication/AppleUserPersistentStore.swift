@@ -8,12 +8,13 @@
 
 import Foundation
 
-public class AppleUserPersistentStore {
+public final class AppleUserPersistentStore {
     
-    private let userDefaults: UserDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
 
-    public init() {
+    public init(userDefaults: UserDefaults = UserDefaults.standard) {
         
+        self.userDefaults = userDefaults
     }
 }
 

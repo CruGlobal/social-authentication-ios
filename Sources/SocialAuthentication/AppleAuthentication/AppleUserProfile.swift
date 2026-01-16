@@ -6,7 +6,7 @@
 
 import Foundation
 
-public struct AppleUserProfile {
+public struct AppleUserProfile: Sendable {
     
     public let email: String?
     public let familyName: String?
