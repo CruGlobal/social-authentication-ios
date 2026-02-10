@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class GoogleAuthenticationConfiguration {
+public struct GoogleAuthenticationConfiguration: Sendable {
     
     public let clientId: String
     public let serverClientId: String?

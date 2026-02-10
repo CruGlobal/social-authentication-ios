@@ -22,11 +22,11 @@ public final class AppleAuthentication: NSObject {
         
         self.appleUserPersistentStore = appleUserPersistentStore
     }
-}
-
-// MARK: - Authentication
-
-extension AppleAuthentication {
+    
+    public func getCurrentUserProfile() -> AppleUserProfile {
+        
+        appleUserPersistentStore.getCurrentUserProfile()
+    }
     
     public func authenticate(completion: @escaping AppleAuthenticationCompletion) {
         
@@ -71,25 +71,10 @@ extension AppleAuthentication {
             }
         }
     }
-}
-
-// MARK: - Sign Out
-
-extension AppleAuthentication {
     
     public func signOut() {
         
         appleUserPersistentStore.deletePersistedUser()
-    }
-}
-
-// MARK: - User
-
-extension AppleAuthentication {
-    
-    public func getCurrentUserProfile() -> AppleUserProfile {
-        
-        appleUserPersistentStore.getCurrentUserProfile()
     }
 }
 
