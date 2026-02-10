@@ -8,8 +8,8 @@
 
 import UIKit
 import FBSDKLoginKit
-import Combine
 import AppTrackingTransparency
+import Combine
 
 public final class FacebookAccessTokenProvider: NSObject {
     
@@ -113,7 +113,7 @@ public final class FacebookAccessTokenProvider: NSObject {
         }
     }
     
-    private func requestTrackingAuthorization() async -> ATTrackingManager.AuthorizationStatus {
+    @MainActor private func requestTrackingAuthorization() async -> ATTrackingManager.AuthorizationStatus {
         
         let status: ATTrackingManager.AuthorizationStatus = await ATTrackingManager.requestTrackingAuthorization()
         
@@ -132,7 +132,7 @@ public final class FacebookAccessTokenProvider: NSObject {
         }
     }
     
-    @MainActor public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<FacebookAccessTokenProviderResponse, Error>) -> Void)) {
+    @MainActor public func authenticate(from viewController: UIViewController) async throws -> FacebookAccessTokenProviderResponse {
         
         let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
         
@@ -141,20 +141,18 @@ public final class FacebookAccessTokenProvider: NSObject {
             tracking: .enabled
         )
         
-        Task {
+        let status: ATTrackingManager.AuthorizationStatus = await requestTrackingAuthorization()
+        
+        guard status == .authorized else {
             
-            let status: ATTrackingManager.AuthorizationStatus = await requestTrackingAuthorization()
+            let statusString: String = getStatusString(status: status)
+            let errorMessage = "FacebookAccessTokenProvider requires that App Tracking Transparency be authorized by the user. Current status is: \(statusString)"
+            let error: Error = NSError(domain: "FacebookAccessTokenProvider", code: 0, userInfo: [NSLocalizedDescriptionKey: errorMessage])
             
-            guard status == .authorized else {
-                
-                let statusString: String = getStatusString(status: status)
-                let errorMessage = "FacebookAccessTokenProvider requires that App Tracking Transparency be authorized by the user. Current status is: \(statusString)"
-                let error: Error = NSError(domain: "FacebookAccessTokenProvider", code: 0, userInfo: [NSLocalizedDescriptionKey: errorMessage])
-
-                completion(.failure(error))
-                
-                return
-            }
+            throw error
+        }
+        
+        return try await withCheckedThrowingContinuation { continuation in
             
             loginManager.logIn(viewController: authenticateFromViewController, configuration: loginConfiguration) { (result: LoginResult)  in
                 
@@ -165,13 +163,18 @@ public final class FacebookAccessTokenProvider: NSObject {
                     let accessToken: String? = token?.tokenString
                     let userId: String? = AccessToken.current?.userID
 
-                    completion(.success(FacebookAccessTokenProviderResponse(accessToken: accessToken, isCancelled: false, userId: userId)))
+                    let response = FacebookAccessTokenProviderResponse(accessToken: accessToken, isCancelled: false, userId: userId)
+                    
+                    continuation.resume(returning: response)
                 
                 case .cancelled:
-                    completion(.success(FacebookAccessTokenProviderResponse(accessToken: nil, isCancelled: true, userId: nil)))
+                    
+                    let response = FacebookAccessTokenProviderResponse(accessToken: nil, isCancelled: true, userId: nil)
+                    
+                    continuation.resume(returning: response)
                 
                 case .failed(let error):
-                    completion(.failure(error))
+                    continuation.resume(throwing: error)
                 }
             }
         }
