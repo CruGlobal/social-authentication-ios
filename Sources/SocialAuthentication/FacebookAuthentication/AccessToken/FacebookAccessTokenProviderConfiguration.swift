@@ -8,7 +8,7 @@
 
 import Foundation
 
-public final class FacebookAccessTokenProviderConfiguration: Sendable {
+public struct FacebookAccessTokenProviderConfiguration: Sendable {
     
     public let permissions: [String]
     

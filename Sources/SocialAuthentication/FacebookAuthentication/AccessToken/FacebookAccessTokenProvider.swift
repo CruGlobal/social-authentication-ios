@@ -41,21 +41,6 @@ public final class FacebookAccessTokenProvider: NSObject {
         return loginManager
     }
     
-    public var accessTokenChangedPublisher: AnyPublisher<String?, Never> {
-        return accessTokenChanged
-            .eraseToAnyPublisher()
-    }
-    
-    @objc private func accessTokenDidChange(notification: Notification) {
-                
-        accessTokenChanged.send(AccessToken.current?.tokenString)
-    }
-}
-
-// MARK: - Authentication
-
-extension FacebookAccessTokenProvider {
-    
     private var trackingIsAuthorized: Bool {
         
         switch ATTrackingManager.trackingAuthorizationStatus {
@@ -88,6 +73,46 @@ extension FacebookAccessTokenProvider {
         }
     }
     
+    public var accessTokenChangedPublisher: AnyPublisher<String?, Never> {
+        return accessTokenChanged
+            .eraseToAnyPublisher()
+    }
+    
+    @objc private func accessTokenDidChange(notification: Notification) {
+                
+        accessTokenChanged.send(AccessToken.current?.tokenString)
+    }
+    
+    public func getAccessToken() -> AccessToken? {
+        
+        return AccessToken.current
+    }
+    
+    public func getUserId() -> String? {
+        
+        return AccessToken.current?.userID
+    }
+    
+    public func getAccessTokenString() -> String? {
+        
+        return AccessToken.current?.tokenString
+    }
+    
+    public func refreshCurrentAccessToken() async throws -> Void {
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            
+            AccessToken.refreshCurrentAccessToken(completion: { (connection: GraphRequestConnecting?, result: Any?, error: Error?) in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                }
+                else {
+                    continuation.resume(returning: Void())
+                }
+            })
+        }
+    }
+    
     private func requestTrackingAuthorization() async -> ATTrackingManager.AuthorizationStatus {
         
         let status: ATTrackingManager.AuthorizationStatus = await ATTrackingManager.requestTrackingAuthorization()
@@ -111,7 +136,10 @@ extension FacebookAccessTokenProvider {
         
         let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
         
-        let loginConfiguration = LoginConfiguration(permissions: configuration.permissions, tracking: .enabled)
+        let loginConfiguration = LoginConfiguration(
+            permissions: configuration.permissions,
+            tracking: .enabled
+        )
         
         Task {
             
@@ -148,46 +176,6 @@ extension FacebookAccessTokenProvider {
             }
         }
     }
-}
-
-// MARK: - Access Token
-
-extension FacebookAccessTokenProvider {
-    
-    public func getAccessToken() -> AccessToken? {
-        
-        return AccessToken.current
-    }
-    
-    public func getUserId() -> String? {
-        
-        return AccessToken.current?.userID
-    }
-    
-    public func getAccessTokenString() -> String? {
-        
-        return AccessToken.current?.tokenString
-    }
-    
-    public func refreshCurrentAccessToken() async throws -> Void {
-        
-        return try await withCheckedThrowingContinuation { continuation in
-            
-            AccessToken.refreshCurrentAccessToken(completion: { (connection: GraphRequestConnecting?, result: Any?, error: Error?) in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                }
-                else {
-                    continuation.resume(returning: Void())
-                }
-            })
-        }
-    }
-}
-
-// MARK: - Sign Out
-
-extension FacebookAccessTokenProvider {
     
     public func signOut() {
         

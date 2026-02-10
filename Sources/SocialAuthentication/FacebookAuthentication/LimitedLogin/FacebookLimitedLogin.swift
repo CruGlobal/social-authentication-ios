@@ -19,37 +19,6 @@ public final class FacebookLimitedLogin {
         self.configuration = configuration
     }
     
-    @MainActor public func authenticate(from viewController: UIViewController, completion: @escaping ((_ result: Result<FacebookLimitedLoginResponse, Error>) -> Void)) {
-        
-        let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
-        
-        let loginConfiguration = LoginConfiguration(permissions: configuration.permissions, tracking: .limited)
-        
-        loginManager.logIn(viewController: authenticateFromViewController, configuration: loginConfiguration) { (result: LoginResult)  in
-            
-            switch result {
-            
-            case .success( _, _, _):
-                
-                let oidcToken: String? = AuthenticationToken.current?.tokenString
-                let nonce: String? = AuthenticationToken.current?.nonce
-
-                completion(.success(FacebookLimitedLoginResponse(oidcToken: oidcToken, nonce: nonce, isCancelled: false)))
-            
-            case .cancelled:
-                completion(.success(FacebookLimitedLoginResponse(oidcToken: nil, nonce: nil, isCancelled: true)))
-            
-            case .failed(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-}
-
-// MARK: - OIDC Token
-
-extension FacebookLimitedLogin {
-    
     public func getAuthenticationToken() -> AuthenticationToken? {
         
         return AuthenticationToken.current
@@ -59,11 +28,43 @@ extension FacebookLimitedLogin {
         
         return AuthenticationToken.current?.tokenString
     }
-}
+    
+    @MainActor public func authenticate(from viewController: UIViewController) async throws -> FacebookLimitedLoginResponse {
+        
+        let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
+        
+        let loginConfiguration = LoginConfiguration(
+            permissions: configuration.permissions,
+            tracking: .limited
+        )
+        
+        // TODO: Remove withCheckedThrowingContinuation once FacebookSDK provides a login with async await. ~Levi
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            
+            loginManager.logIn(viewController: authenticateFromViewController, configuration: loginConfiguration) { (result: LoginResult)  in
+                
+                switch result {
+                
+                case .success( _, _, _):
+                    
+                    let oidcToken: String? = AuthenticationToken.current?.tokenString
+                    let nonce: String? = AuthenticationToken.current?.nonce
 
-// MARK: - Sign Out
-
-extension FacebookLimitedLogin {
+                    let response = FacebookLimitedLoginResponse(oidcToken: oidcToken, nonce: nonce, isCancelled: false)
+                    continuation.resume(returning: response)
+                
+                case .cancelled:
+                    
+                    let response = FacebookLimitedLoginResponse(oidcToken: nil, nonce: nil, isCancelled: true)
+                    continuation.resume(returning: response)
+                
+                case .failed(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
     
     public func signOut() {
         

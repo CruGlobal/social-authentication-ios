@@ -28,18 +28,19 @@ public final class AppleAuthentication: NSObject {
         appleUserPersistentStore.getCurrentUserProfile()
     }
     
-    public func authenticate(completion: @escaping AppleAuthenticationCompletion) {
+    public func getIsAuthenticated(completion: @escaping ((_ isAuthenticated: Bool) -> Void)) {
         
-        self.completionBlock = completion
-        
-        let appleIdProvider = ASAuthorizationAppleIDProvider()
-        let request = appleIdProvider.createRequest()
-        request.requestedScopes = [.email, .fullName]
-        
-        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-        authorizationController.delegate = self
-        authorizationController.performRequests()
-        
+        getAuthenticationState { authenticationState in
+            
+            switch authenticationState {
+                
+            case .authorized:
+                completion(true)
+                
+            case .revoked, .notFound, .transferred, .unknown:
+                completion(false)
+            }
+        }
     }
     
     public func getAuthenticationState(completion: @escaping ((_ authenticationState: AppleAuthenticationState) -> Void)) {
@@ -57,19 +58,17 @@ public final class AppleAuthentication: NSObject {
         }
     }
     
-    public func isAuthenticated(completion: @escaping ((_ isAuthenticated: Bool) -> Void)) {
+    public func authenticate(completion: @escaping AppleAuthenticationCompletion) {
         
-        getAuthenticationState { authenticationState in
-            
-            switch authenticationState {
-                
-            case .authorized:
-                completion(true)
-                
-            case .revoked, .notFound, .transferred, .unknown:
-                completion(false)
-            }
-        }
+        self.completionBlock = completion
+        
+        let appleIdProvider = ASAuthorizationAppleIDProvider()
+        let request = appleIdProvider.createRequest()
+        request.requestedScopes = [.email, .fullName]
+        
+        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authorizationController.delegate = self
+        authorizationController.performRequests()
     }
     
     public func signOut() {
