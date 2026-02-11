@@ -9,7 +9,7 @@
 import Foundation
 import AuthenticationServices
 
-public enum AppleAuthenticationState {
+public enum AppleAuthenticationState: Sendable {
     
     case authorized
     case revoked
@@ -25,6 +25,15 @@ public enum AppleAuthenticationState {
         case .notFound:     self = .notFound
         case .transferred:  self = .transferred
         @unknown default:   self = .unknown
+        }
+    }
+    
+    public var isAuthenticated: Bool {
+        switch self {
+        case .authorized:
+            return true
+        default:
+            return false
         }
     }
 }

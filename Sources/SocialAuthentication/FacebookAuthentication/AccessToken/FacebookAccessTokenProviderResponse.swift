@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct FacebookAccessTokenProviderResponse {
+public struct FacebookAccessTokenProviderResponse: Sendable {
     
     public let accessToken: String?
     public let isCancelled: Bool

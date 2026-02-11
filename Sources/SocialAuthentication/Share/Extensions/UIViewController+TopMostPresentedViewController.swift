@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIViewController {
+@MainActor extension UIViewController {
     
     func getTopMostPresentedViewController() -> UIViewController? {
         

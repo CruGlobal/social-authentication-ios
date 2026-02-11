@@ -8,6 +8,6 @@
 
 import Foundation
 
-enum AppleAuthenticationError: Error {
+enum AppleAuthenticationError: Error, Sendable {
     case noAuthCredential
 }

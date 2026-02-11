@@ -8,136 +8,86 @@
 
 import Foundation
 import AuthenticationServices
-import Combine
 
-public class AppleAuthentication: NSObject {
+public final class AppleAuthentication {
     
-    public typealias AppleAuthenticationCompletion = ((_ result: Result<AppleAuthenticationResponse, Error>) -> Void)
-    
-    private var completionBlock: AppleAuthenticationCompletion?
-    
+    private let appleAuthorization: AppleAuthorization = AppleAuthorization()
     private let appleUserPersistentStore: AppleUserPersistentStore
     
     public init(appleUserPersistentStore: AppleUserPersistentStore) {
         
         self.appleUserPersistentStore = appleUserPersistentStore
     }
-}
-
-// MARK: - Authentication
-
-extension AppleAuthentication {
-    
-    public func authenticate(completion: @escaping AppleAuthenticationCompletion) {
-        self.completionBlock = completion
-        
-        let appleIdProvider = ASAuthorizationAppleIDProvider()
-        let request = appleIdProvider.createRequest()
-        request.requestedScopes = [.email, .fullName]
-        
-        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-        authorizationController.delegate = self
-        authorizationController.performRequests()
-        
-    }
-    
-    public func getAuthenticationState(completion: @escaping ((_ authenticationState: AppleAuthenticationState) -> Void)) {
-        
-        guard let userId = appleUserPersistentStore.getUserId() else {
-            completion(.notFound)
-            return
-        }
-        
-        let appleIDProvider = ASAuthorizationAppleIDProvider()
-        appleIDProvider.getCredentialState(forUserID: userId) { (credentialState, error) in
-            
-            let authState = AppleAuthenticationState(credentialState: credentialState)
-            completion(authState)
-        }
-    }
-    
-    public func isAuthenticated(completion: @escaping ((_ isAuthenticated: Bool) -> Void)) {
-        
-        getAuthenticationState { authenticationState in
-            
-            switch authenticationState {
-                
-            case .authorized:
-                completion(true)
-                
-            case .revoked, .notFound, .transferred, .unknown:
-                completion(false)
-            }
-        }
-    }
-}
-
-// MARK: - Sign Out
-
-extension AppleAuthentication {
-    
-    public func signOut() {
-        
-        appleUserPersistentStore.deletePersistedUser()
-    }
-}
-
-// MARK: - User
-
-extension AppleAuthentication {
     
     public func getCurrentUserProfile() -> AppleUserProfile {
         
         appleUserPersistentStore.getCurrentUserProfile()
     }
-}
-
-// MARK: - ASAuthorizationControllerDelegate
-
-extension AppleAuthentication: ASAuthorizationControllerDelegate {
     
-    public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    public func getIsAuthenticated() async throws -> Bool {
         
-        guard let completion = completionBlock else { return }
+        let authState: AppleAuthenticationState = try await getAuthenticationState()
         
-        let errorCode: Int = (error as NSError).code
+        return authState.isAuthenticated
+    }
+    
+    public func getAuthenticationState() async throws -> AppleAuthenticationState {
         
-        if errorCode == ASAuthorizationError.canceled.rawValue || errorCode == ASAuthorizationError.unknown.rawValue {
-            
-            completion(.success(AppleAuthenticationResponse.userCancelledResponse()))
+        guard let userId = appleUserPersistentStore.getUserId() else {
+            return .notFound
         }
-        else {
+        
+        let appleIDProvider = ASAuthorizationAppleIDProvider()
+        
+        let credentialState = try await appleIDProvider.credentialState(forUserID: userId)
+        
+        let authState = AppleAuthenticationState(credentialState: credentialState)
+        
+        return authState
+    }
+
+    @MainActor public func authenticate(requestScopes: [ASAuthorization.Scope] = [.email, .fullName]) async throws -> AppleAuthenticationResponse {
+        
+        let persistentStore: AppleUserPersistentStore = self.appleUserPersistentStore
+        
+        return try await withCheckedThrowingContinuation { continuation in
             
-            completion(.failure(error))
+            appleAuthorization.authenticate(requestScopes: requestScopes) { (result: Result<AppleAuthenticationResponse, Error>) in
+                
+                switch result {
+                case .success(let response):
+                    
+                    if let userId = response.userId {
+                        
+                        persistentStore.storeUserInfo(
+                            email: response.email,
+                            familyName: response.fullName?.familyName,
+                            givenName: response.fullName?.givenName
+                        )
+                        
+                        let status: OSStatus = persistentStore.storeUserId(
+                            userId: userId
+                        )
+                        
+                        let responseWithStatus = response.copy(persistUserIdStatus: status)
+                        
+                        continuation.resume(returning: responseWithStatus)
+                    }
+                    else {
+                        
+                        continuation.resume(returning: response)
+                    }
+
+                    
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
         }
     }
     
-    public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+    public func signOut() -> OSStatus {
         
-        guard let completion = completionBlock else { return }
-        
-        guard let appleIdCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-            
-            completion(.failure(AppleAuthenticationError.noAuthCredential))
-            return
-        }
-        
-        let email = appleIdCredential.email
-        let fullName = appleIdCredential.fullName
-        let userId = appleIdCredential.user
-        
-        let response = AppleAuthenticationResponse(
-            authorizationCode: appleIdCredential.getAuthorizationCodeString(),
-            email: email,
-            fullName: fullName,
-            identityToken: appleIdCredential.getIdentityTokenString(),
-            isCancelled: false,
-            userId: userId
-        )
-        
-        completion(.success(response))
-        
-        appleUserPersistentStore.storeUserInfo(email: email, familyName: fullName?.familyName, givenName: fullName?.givenName)
-        appleUserPersistentStore.storeUserId(userId)
+        return appleUserPersistentStore.deletePersistedUser()
     }
 }

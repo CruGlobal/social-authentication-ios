@@ -10,7 +10,7 @@
 
 import Foundation
 
-public struct FacebookLimitedLoginResponse {
+public struct FacebookLimitedLoginResponse: Sendable {
     
     public let oidcToken: String?
     public let nonce: String?

@@ -2,25 +2,31 @@
 //  FacebookProfile.swift
 //  SocialAuthentication
 //
-//  Created by Levi Eggert on 4/18/23.
-//  Copyright © 2023 Cru Global, Inc. All rights reserved.
+//  Created by Levi Eggert on 2/10/26.
 //
 
 import Foundation
-import FBSDKLoginKit
 
-public class FacebookProfile {
+public struct FacebookProfile: Sendable {
     
-    public init() {
+    public let email: String?
+    public let firstName: String?
+    public let imageURL: URL?
+    public let lastName: String?
+    public let linkURL: URL?
+    public let middleName: String?
+    public let name: String?
+    public let userId: String
+    
+    public init(email: String?, firstName: String?, imageURL: URL?, lastName: String?, linkURL: URL?, middleName: String?, name: String?, userId: String) {
         
-    }
-    
-    public static var current: Profile? {
-        return Profile.current
-    }
-    
-    public func loadUserProfile(completion: @escaping ((_ profile: Profile?, _ error: Error?) -> Void)) {
-        
-        Profile.loadCurrentProfile(completion: completion)
+        self.email = email
+        self.firstName = firstName
+        self.imageURL = imageURL
+        self.lastName = lastName
+        self.linkURL = linkURL
+        self.middleName = middleName
+        self.name = name
+        self.userId = userId
     }
 }

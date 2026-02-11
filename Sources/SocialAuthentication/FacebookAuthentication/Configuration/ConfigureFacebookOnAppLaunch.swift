@@ -9,7 +9,7 @@
 import UIKit
 import FBSDKCoreKit
 
-public class ConfigureFacebookOnAppLaunch {
+public final class ConfigureFacebookOnAppLaunch {
     
     public static func configure(application: UIApplication, launchOptions: [UIApplication.LaunchOptionsKey: Any]?, configuration: FacebookConfiguration) {
         

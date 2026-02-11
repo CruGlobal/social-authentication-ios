@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class FacebookConfiguration {
+public struct FacebookConfiguration: Sendable {
     
     public let appId: String
     public let clientToken: String

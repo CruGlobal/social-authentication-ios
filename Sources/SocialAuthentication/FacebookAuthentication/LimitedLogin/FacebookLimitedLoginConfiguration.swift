@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class FacebookLimitedLoginConfiguration {
+public struct FacebookLimitedLoginConfiguration: Sendable {
     
     public let permissions: [String]
     

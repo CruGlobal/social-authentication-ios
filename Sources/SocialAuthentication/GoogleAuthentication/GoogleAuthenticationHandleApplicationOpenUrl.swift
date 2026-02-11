@@ -9,7 +9,7 @@
 import Foundation
 import GoogleSignIn
 
-public class GoogleAuthenticationHandleApplicationOpenUrl {
+public final class GoogleAuthenticationHandleApplicationOpenUrl {
     
     public static func handleUrl(url: URL) -> Bool {
         

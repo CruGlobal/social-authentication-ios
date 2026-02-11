@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import AuthenticationServices
 
-public struct AppleAuthenticationResponse {
+public struct AppleAuthenticationResponse: Sendable {
     
     public let authorizationCode: String?
     public let email: String?
@@ -16,8 +17,9 @@ public struct AppleAuthenticationResponse {
     public let identityToken: String?
     public let isCancelled: Bool
     public let userId: String?
+    public let persistUserIdStatus: OSStatus?
     
-    public init(authorizationCode: String?, email: String?, fullName: PersonNameComponents?, identityToken: String?, isCancelled: Bool, userId: String?) {
+    public init(authorizationCode: String?, email: String?, fullName: PersonNameComponents?, identityToken: String?, isCancelled: Bool, userId: String?, persistUserIdStatus: OSStatus?) {
         
         self.authorizationCode = authorizationCode
         self.email = email
@@ -25,6 +27,21 @@ public struct AppleAuthenticationResponse {
         self.identityToken = identityToken
         self.isCancelled = isCancelled
         self.userId = userId
+        self.persistUserIdStatus = persistUserIdStatus
+    }
+    
+    func copy(persistUserIdStatus: OSStatus?) -> AppleAuthenticationResponse {
+        
+        return AppleAuthenticationResponse(
+            authorizationCode: self.authorizationCode,
+            email: self.email,
+            fullName: self.fullName,
+            identityToken: self.identityToken,
+            isCancelled: self.isCancelled,
+            userId: self.userId,
+            persistUserIdStatus: persistUserIdStatus ?? self.persistUserIdStatus
+        )
+        
     }
     
     static func userCancelledResponse() -> AppleAuthenticationResponse {
@@ -34,7 +51,8 @@ public struct AppleAuthenticationResponse {
             fullName: nil,
             identityToken: nil,
             isCancelled: true,
-            userId: nil
+            userId: nil,
+            persistUserIdStatus: nil
         )
     }
 }

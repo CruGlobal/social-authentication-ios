@@ -9,7 +9,7 @@
 import Foundation
 import GoogleSignIn
 
-public struct GoogleAuthenticationResponse {
+public struct GoogleAuthenticationResponse: Sendable {
     
     public let idToken: String?
     public let isCancelled: Bool

@@ -8,18 +8,14 @@
 
 import Foundation
 
-public class AppleUserPersistentStore {
+public final class AppleUserPersistentStore {
     
-    private let userDefaults: UserDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
 
-    public init() {
+    public init(userDefaults: UserDefaults = UserDefaults.standard) {
         
+        self.userDefaults = userDefaults
     }
-}
-
-// MARK: - Public
-
-extension AppleUserPersistentStore {
     
     public func getCurrentUserProfile() -> AppleUserProfile {
         
@@ -39,16 +35,16 @@ extension AppleUserPersistentStore {
         storeUserDefaults(email: email, familyName: familyName, givenName: givenName)
     }
     
-    public func storeUserId(_ userId: String?) {
-        guard let userId = userId else { return }
+    public func storeUserId(userId: String) -> OSStatus {
         
-        storeUserIdInKeychain(userId)
+        return storeUserIdInKeychain(userId)
     }
     
-    public func deletePersistedUser() {
+    public func deletePersistedUser() -> OSStatus {
         
         deleteUserDefaults()
-        deleteKeychainItems()
+        
+        return deleteKeychainItems()
     }
 }
 
@@ -78,6 +74,7 @@ extension AppleUserPersistentStore {
         userDefaults.set(email, forKey: UserDefaultKey.appleUserEmail.rawValue)
         userDefaults.set(familyName, forKey: UserDefaultKey.appleUserFamilyName.rawValue)
         userDefaults.set(givenName, forKey: UserDefaultKey.appleUserGivenName.rawValue)
+        userDefaults.synchronize()
     }
     
     private func deleteUserDefaults() {
@@ -85,6 +82,8 @@ extension AppleUserPersistentStore {
         for userDefaultkey in UserDefaultKey.allCases {
             userDefaults.removeObject(forKey: userDefaultkey.rawValue)
         }
+        
+        userDefaults.synchronize()
     }
 }
 
@@ -98,6 +97,7 @@ extension AppleUserPersistentStore {
     }
     
     private func getUserIdFromKeychain() -> String? {
+        
         let query = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: KeychainKeys.service,
@@ -106,19 +106,22 @@ extension AppleUserPersistentStore {
         ] as CFDictionary
         
         var getResult: AnyObject?
+        
         let status = SecItemCopyMatching(query, &getResult)
         
-        if status == errSecSuccess {
+        if status == errSecSuccess, let resultData = getResult as? Data {
             
-            guard let resultData = getResult as? Data else { return nil }
-            return String(data: resultData, encoding: .utf8)
-            
-        } else {
+            return String(
+                data: resultData,
+                encoding: .utf8
+            )
+        }
+        else {
             return nil
         }
     }
     
-    private func storeUserIdInKeychain(_ userId: String) {
+    private func storeUserIdInKeychain(_ userId: String) -> OSStatus {
         
         let query = [
             kSecClass as String: kSecClassGenericPassword,
@@ -129,21 +132,10 @@ extension AppleUserPersistentStore {
         
         let status = SecItemAdd(query, nil)
         
-        if status == errSecSuccess {
-           print("Apple Auth UserId store success")
-            
-        } else if status == errSecDuplicateItem {
-            print("Apple Auth UserId duplicate exists")
-            
-        } else {
-            
-            let error = NSError(domain: NSOSStatusErrorDomain, code: Int(status))
-            
-            assertionFailure("error storing userId in keychain: \(error.code)")
-        }
+        return status
     }
     
-    private func deleteUserId() {
+    private func deleteUserId() -> OSStatus {
         
         let query = [
             kSecClass as String: kSecClassGenericPassword,
@@ -153,15 +145,10 @@ extension AppleUserPersistentStore {
         
         let status = SecItemDelete(query)
         
-        if status != errSecSuccess || status != errSecItemNotFound {
-            
-            let error = NSError(domain: NSOSStatusErrorDomain, code: Int(status))
-            
-            assertionFailure("error removing userId from keychain: \(error.code)")
-        }
+        return status
     }
     
-    private func deleteKeychainItems() {
-        deleteUserId()
+    private func deleteKeychainItems() -> OSStatus {
+        return deleteUserId()
     }
 }
