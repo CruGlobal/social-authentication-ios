@@ -27,4 +27,13 @@ public enum AppleAuthenticationState: Sendable {
         @unknown default:   self = .unknown
         }
     }
+    
+    public var isAuthenticated: Bool {
+        switch self {
+        case .authorized:
+            return true
+        default:
+            return false
+        }
+    }
 }

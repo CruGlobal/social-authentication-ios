@@ -41,21 +41,13 @@ import Combine
             }
             .store(in: &cancellables)
         
-        appleAuthentication.isAuthenticated { [weak self] isAuthenticated in
-            
-            self?.appleIsAuthenticated = isAuthenticated
+        Task {
+            appleIsAuthenticated = try await appleAuthentication.getIsAuthenticated()
         }
-                
-        googleAuthentication.restorePreviousSignIn { [weak self] (result: Result<GoogleAuthenticationResponse, Error>) in
-            
-            switch result {
-                
-            case .success(let response):
-                self?.googleIsAuthenticated = response.idToken != nil
-                
-            case .failure(let error):
-                print(error)
-            }
+        
+        Task {
+            let response = try await googleAuthentication.restorePreviousSignIn()
+            googleIsAuthenticated = response.idToken != nil
         }
     }
 }
@@ -66,62 +58,56 @@ extension SignInWithSocialViewModel {
     
     func signInForFacebookAccessToken() {
         
-        facebookAccessTokenProvider.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<FacebookAccessTokenProviderResponse, Error>) in
-            
-            switch result {
-            case .success(let response):
+        Task {
+            do {
+                let response = try await facebookAccessTokenProvider.authenticate(from: socialAuthPresenter)
                 print(response.accessToken ?? "x")
-            case .failure(let error):
-                print(error)
+                userName = LoadFacebookProfile.current?.name ?? ""
             }
-            
-            self?.userName = FacebookProfile.current?.name ?? ""
+            catch let error {
+                print("\n Facebook Access Token login error: \(error)")
+            }
         }
     }
     
     func signInForFacebookLimitedLogin() {
         
-        facebookLimitedLogin.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<FacebookLimitedLoginResponse, Error>) in
-            
-            switch result {
-            case .success(let response):
+        Task {
+            do {
+                let response = try await facebookLimitedLogin.authenticate(from: socialAuthPresenter)
                 print(response.oidcToken ?? "x")
-            case .failure(let error):
-                print(error)
+                userName = LoadFacebookProfile.current?.name ?? ""
             }
-            
-            self?.userName = FacebookProfile.current?.name ?? ""
+            catch let error {
+                print("\n Facebook Limited login error: \(error)")
+            }
         }
     }
     
     func signInWithGoogleTapped() {
         
-        googleAuthentication.authenticate(from: socialAuthPresenter) { [weak self] (result: Result<GoogleAuthenticationResponse, Error>) in
-            
-            switch result {
-                
-            case .success(let response):
-                self?.googleIsAuthenticated = response.idToken != nil
-                
-            case .failure(let error):
-                print(error)
+        Task {
+            do {
+                let response = try await googleAuthentication.authenticate(from: socialAuthPresenter)
+                googleIsAuthenticated = response.idToken != nil
+                userName = googleAuthentication.getCurrentUserProfile()?.name ?? ""
             }
-            
-            self?.userName = self?.googleAuthentication.getCurrentUserProfile()?.name ?? ""
+            catch let error {
+                print("\n Google sign-in error: \(error)")
+            }
         }
     }
     
     func signInWithAppleTapped() {
         
-        appleAuthentication.authenticate { [weak self] (result: Result<AppleAuthenticationResponse, Error>) in
-            
-            switch result {
-           
-            case .success(let response):
-                self?.userName = response.fullName?.familyName ?? ""
-                
-            case .failure( _):
-                break
+        Task {
+            do {
+                let response = try await appleAuthentication.authenticate()
+                userName = response.fullName?.familyName ?? ""
+                appleIsAuthenticated = true
+            }
+            catch let error {
+                print("\n Apple sign-in error: \(error)")
             }
         }
     }
