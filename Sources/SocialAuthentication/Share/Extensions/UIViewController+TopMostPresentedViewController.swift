@@ -10,7 +10,7 @@ import UIKit
 
 @MainActor extension UIViewController {
     
-    func getTopMostPresentedViewController() -> UIViewController? {
+    public func getTopMostPresentedViewController() -> UIViewController? {
         
         var nextTopMostPresentedViewController: UIViewController? = self
         var topMostPresentedViewController: UIViewController?
