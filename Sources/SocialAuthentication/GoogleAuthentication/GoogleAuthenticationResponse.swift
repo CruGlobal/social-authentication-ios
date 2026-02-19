@@ -13,6 +13,12 @@ public struct GoogleAuthenticationResponse: Sendable {
     
     public let idToken: String?
     public let isCancelled: Bool
+    
+    public init(idToken: String?, isCancelled: Bool) {
+     
+        self.idToken = idToken
+        self.isCancelled = isCancelled
+    }
 }
 
 extension GoogleAuthenticationResponse {
