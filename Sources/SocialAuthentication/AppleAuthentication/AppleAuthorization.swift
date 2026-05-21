@@ -32,10 +32,9 @@ public final class AppleAuthorization: NSObject {
         request.requestedScopes = requestScopes
         
         let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authController = authorizationController
         authorizationController.delegate = self
         authorizationController.performRequests()
-        
-        authController = authorizationController
     }
     
     public var isAuthenticating: Bool {
