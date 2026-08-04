@@ -43,9 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     permissions: ["email"]
                 )
             ),
-            appleAuthentication: AppleAuthentication(
-                appleUserPersistentStore: AppleUserPersistentStore()
-            ),
+            appleAuthentication: AppleAuthentication(),
             googleAuthentication: GoogleAuthentication(
                 configuration: GoogleAuthenticationConfiguration(
                     clientId: "71275134527-st5s63prkvuh46t7ohb1gmhq39qokh78.apps.googleusercontent.com",

@@ -9,7 +9,8 @@ import UIKit
 import SocialAuthentication
 import Combine
 
-@MainActor class SignInWithSocialViewModel: ObservableObject {
+@MainActor
+final class SignInWithSocialViewModel: ObservableObject {
     
     private let socialAuthPresenter: UIViewController
     private let facebookAccessTokenProvider: FacebookAccessTokenProvider
@@ -19,12 +20,18 @@ import Combine
     
     private var cancellables: Set<AnyCancellable> = Set()
     
-    @Published var facebookHasPersistedAccessToken: Bool = false
-    @Published var appleIsAuthenticated: Bool = false
-    @Published var googleIsAuthenticated: Bool = false
-    @Published var userName: String = ""
+    @Published private(set) var facebookHasPersistedAccessToken: Bool = false
+    @Published private(set) var appleIsAuthenticated: Bool = false
+    @Published private(set) var googleIsAuthenticated: Bool = false
+    @Published private(set) var userName: String = ""
     
-    init(socialAuthPresenter: UIViewController, facebookAccessTokenProvider: FacebookAccessTokenProvider, facebookLimitedLogin: FacebookLimitedLogin, appleAuthentication: AppleAuthentication, googleAuthentication: GoogleAuthentication) {
+    init(
+        socialAuthPresenter: UIViewController,
+        facebookAccessTokenProvider: FacebookAccessTokenProvider,
+        facebookLimitedLogin: FacebookLimitedLogin,
+        appleAuthentication: AppleAuthentication,
+        googleAuthentication: GoogleAuthentication
+    ) {
         
         self.socialAuthPresenter = socialAuthPresenter
         self.facebookAccessTokenProvider = facebookAccessTokenProvider

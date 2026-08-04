@@ -11,6 +11,7 @@ import FBSDKLoginKit
 import AppTrackingTransparency
 import Combine
 
+@MainActor
 public final class FacebookAccessTokenProvider: NSObject {
     
     private let loginManager: LoginManager = LoginManager()
@@ -113,7 +114,7 @@ public final class FacebookAccessTokenProvider: NSObject {
         }
     }
     
-    @MainActor private func requestTrackingAuthorization() async -> ATTrackingManager.AuthorizationStatus {
+    private func requestTrackingAuthorization() async -> ATTrackingManager.AuthorizationStatus {
         
         let status: ATTrackingManager.AuthorizationStatus = await ATTrackingManager.requestTrackingAuthorization()
         
@@ -132,7 +133,9 @@ public final class FacebookAccessTokenProvider: NSObject {
         }
     }
     
-    @MainActor public func authenticate(from viewController: UIViewController) async throws -> FacebookAccessTokenProviderResponse {
+    public func authenticate(
+        from viewController: UIViewController
+    ) async throws -> FacebookAccessTokenProviderResponse {
         
         let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
         

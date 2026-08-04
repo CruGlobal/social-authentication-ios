@@ -8,21 +8,25 @@
 
 import Foundation
 
-public final class AppleUserPersistentStore {
+public final class AppleUserPersistentStore: Sendable {
     
-    private let userDefaults: UserDefaults
+    private let socialAuthUserDefaults: SocialAuthUserDefaultsInterface
 
-    public init(userDefaults: UserDefaults = UserDefaults.standard) {
+    public init(socialAuthUserDefaults: SocialAuthUserDefaultsInterface) {
         
-        self.userDefaults = userDefaults
+        self.socialAuthUserDefaults = socialAuthUserDefaults
     }
     
-    public func getCurrentUserProfile() -> AppleUserProfile {
+    public func getCurrentUserProfile() async -> AppleUserProfile {
+        
+        let email: String? = await getUserEmail()
+        let familyName: String? = await getUserFamilyName()
+        let givenName: String? = await getUserGivenName()
         
         return AppleUserProfile(
-            email: getUserEmail(),
-            familyName: getUserFamilyName(),
-            givenName: getUserGivenName()
+            email: email,
+            familyName: familyName,
+            givenName: givenName
         )
     }
     
@@ -30,9 +34,9 @@ public final class AppleUserPersistentStore {
         return getUserIdFromKeychain()
     }
     
-    public func storeUserInfo(email: String?, familyName: String?, givenName: String?) {
+    public func storeUserInfo(email: String?, familyName: String?, givenName: String?) async {
         
-        storeUserDefaults(email: email, familyName: familyName, givenName: givenName)
+        await storeUserDefaults(email: email, familyName: familyName, givenName: givenName)
     }
     
     public func storeUserId(userId: String) -> OSStatus {
@@ -40,9 +44,9 @@ public final class AppleUserPersistentStore {
         return storeUserIdInKeychain(userId)
     }
     
-    public func deletePersistedUser() -> OSStatus {
+    public func deletePersistedUser() async -> OSStatus {
         
-        deleteUserDefaults()
+        await deleteUserDefaults()
         
         return deleteKeychainItems()
     }
@@ -58,32 +62,33 @@ extension AppleUserPersistentStore {
         case appleUserGivenName
     }
     
-    private func getUserEmail() -> String? {
-        return userDefaults.string(forKey: UserDefaultKey.appleUserEmail.rawValue)
+    private func getUserEmail() async -> String? {
+        return await socialAuthUserDefaults.getString(key: UserDefaultKey.appleUserEmail.rawValue)
     }
     
-    private func getUserFamilyName() -> String? {
-        return userDefaults.string(forKey: UserDefaultKey.appleUserFamilyName.rawValue)
+    private func getUserFamilyName() async -> String? {
+        return await socialAuthUserDefaults.getString(key: UserDefaultKey.appleUserFamilyName.rawValue)
     }
     
-    private func getUserGivenName() -> String? {
-        return userDefaults.string(forKey: UserDefaultKey.appleUserGivenName.rawValue)
+    private func getUserGivenName() async -> String? {
+        return await socialAuthUserDefaults.getString(key: UserDefaultKey.appleUserGivenName.rawValue)
     }
     
-    private func storeUserDefaults(email: String?, familyName: String?, givenName: String?) {
-        userDefaults.set(email, forKey: UserDefaultKey.appleUserEmail.rawValue)
-        userDefaults.set(familyName, forKey: UserDefaultKey.appleUserFamilyName.rawValue)
-        userDefaults.set(givenName, forKey: UserDefaultKey.appleUserGivenName.rawValue)
-        userDefaults.synchronize()
+    private func storeUserDefaults(email: String?, familyName: String?, givenName: String?) async {
+        
+        await socialAuthUserDefaults.storeString(value: email, forKey: UserDefaultKey.appleUserEmail.rawValue)
+        await socialAuthUserDefaults.storeString(value: familyName, forKey: UserDefaultKey.appleUserFamilyName.rawValue)
+        await socialAuthUserDefaults.storeString(value: givenName, forKey: UserDefaultKey.appleUserGivenName.rawValue)
+        await socialAuthUserDefaults.commitChanges()
     }
     
-    private func deleteUserDefaults() {
+    private func deleteUserDefaults() async {
         
         for userDefaultkey in UserDefaultKey.allCases {
-            userDefaults.removeObject(forKey: userDefaultkey.rawValue)
+            await socialAuthUserDefaults.deleteValue(key: userDefaultkey.rawValue)
         }
-        
-        userDefaults.synchronize()
+                
+        await socialAuthUserDefaults.commitChanges()
     }
 }
 
