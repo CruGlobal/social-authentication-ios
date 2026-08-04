@@ -52,22 +52,20 @@ public final class AppleAuthentication {
     }
 
     public func authenticate(requestScopes: [ASAuthorization.Scope] = [.email, .fullName]) async throws -> AppleAuthenticationResponse {
-        
-        let persistentStore: AppleUserPersistentStore = self.appleUserPersistentStore
-        
+                
         let response = try await appleAuthorization.authenticate(requestScopes: requestScopes)
         
         guard let userId = response.userId else {
             return response
         }
         
-        await persistentStore.storeUserInfo(
+        await appleUserPersistentStore.storeUserInfo(
             email: response.email,
             familyName: response.fullName?.familyName,
             givenName: response.fullName?.givenName
         )
         
-        let status: OSStatus = persistentStore.storeUserId(
+        let status: OSStatus = appleUserPersistentStore.storeUserId(
             userId: userId
         )
         
