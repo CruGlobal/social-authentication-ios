@@ -17,7 +17,14 @@ public struct FacebookConfiguration: Sendable {
     public let isAdvertiserIDCollectionEnabled: Bool
     public let isSKAdNetworkReportEnabled: Bool
     
-    public init(appId: String, clientToken: String, displayName: String, isAutoLogAppEventsEnabled: Bool, isAdvertiserIDCollectionEnabled: Bool, isSKAdNetworkReportEnabled: Bool) {
+    public init(
+        appId: String,
+        clientToken: String,
+        displayName: String,
+        isAutoLogAppEventsEnabled: Bool,
+        isAdvertiserIDCollectionEnabled: Bool,
+        isSKAdNetworkReportEnabled: Bool
+    ) {
         
         self.appId = appId
         self.clientToken = clientToken

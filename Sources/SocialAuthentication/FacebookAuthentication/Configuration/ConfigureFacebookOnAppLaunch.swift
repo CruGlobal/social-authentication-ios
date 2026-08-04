@@ -9,9 +9,14 @@
 import UIKit
 import FBSDKCoreKit
 
+@MainActor
 public final class ConfigureFacebookOnAppLaunch {
     
-    public static func configure(application: UIApplication, launchOptions: [UIApplication.LaunchOptionsKey: Any]?, configuration: FacebookConfiguration) {
+    public static func configure(
+        application: UIApplication,
+        launchOptions: [UIApplication.LaunchOptionsKey: Any]?,
+        configuration: FacebookConfiguration
+    ) {
         
         Settings.shared.clientToken = configuration.clientToken
         Settings.shared.appID = configuration.appId

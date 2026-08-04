@@ -9,10 +9,8 @@
 import UIKit
 import GoogleSignIn
 
-public final class GoogleAuthentication {
-    
-    private let sharedGoogleSignIn: GIDSignIn = GIDSignIn.sharedInstance
-    
+public final class GoogleAuthentication: Sendable {
+        
     public init(configuration: GoogleAuthenticationConfiguration) {
         
         sharedGoogleSignIn.configuration = GIDConfiguration.init(
@@ -21,6 +19,10 @@ public final class GoogleAuthentication {
             hostedDomain: configuration.hostedDomain,
             openIDRealm: configuration.openIDRealm
         )
+    }
+    
+    private var sharedGoogleSignIn: GIDSignIn {
+        return GIDSignIn.sharedInstance
     }
     
     public func getGoogleSignIn() -> GIDSignIn {

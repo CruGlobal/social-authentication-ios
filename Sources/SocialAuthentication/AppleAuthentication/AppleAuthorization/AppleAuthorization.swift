@@ -9,6 +9,7 @@
 import Foundation
 import AuthenticationServices
 
+@MainActor
 public final class AppleAuthorization: NSObject {
     
     public typealias AppleAuthenticationCompletion = ((_ result: Result<AppleAuthenticationResponse, Error>) -> Void)
@@ -16,7 +17,25 @@ public final class AppleAuthorization: NSObject {
     private var authController: ASAuthorizationController?
     private var completionBlock: AppleAuthenticationCompletion?
     
-    public func authenticate(requestScopes: [ASAuthorization.Scope], completion: @escaping AppleAuthenticationCompletion) {
+    public func authenticate(requestScopes: [ASAuthorization.Scope]) async throws -> AppleAuthenticationResponse {
+        
+        try await withCheckedThrowingContinuation { continuation in
+        
+            authenticateWithCompletion(requestScopes: requestScopes) { result in
+                switch result {
+                case .success(let response):
+                    continuation.resume(returning: response)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    private func authenticateWithCompletion(
+        requestScopes: [ASAuthorization.Scope],
+        completion: @escaping AppleAuthenticationCompletion
+    ) {
         
         if let authController = authController {
             completionBlock = nil

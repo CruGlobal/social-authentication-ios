@@ -9,19 +9,24 @@
 import Foundation
 import AuthenticationServices
 
+@MainActor
 public final class AppleAuthentication {
     
     private let appleAuthorization: AppleAuthorization = AppleAuthorization()
     private let appleUserPersistentStore: AppleUserPersistentStore
     
-    public init(appleUserPersistentStore: AppleUserPersistentStore) {
+    public init(
+        socialAuthUserDefaults: SocialAuthUserDefaultsInterface = SocialAuthUserDefaults(
+            userDefaults: UserDefaults.standard
+        )
+    ) {
         
-        self.appleUserPersistentStore = appleUserPersistentStore
+        self.appleUserPersistentStore = AppleUserPersistentStore(socialAuthUserDefaults: socialAuthUserDefaults)
     }
     
-    public func getCurrentUserProfile() -> AppleUserProfile {
+    public func getCurrentUserProfile() async -> AppleUserProfile {
         
-        appleUserPersistentStore.getCurrentUserProfile()
+        return await appleUserPersistentStore.getCurrentUserProfile()
     }
     
     public func getIsAuthenticated() async throws -> Bool {
@@ -46,48 +51,33 @@ public final class AppleAuthentication {
         return authState
     }
 
-    @MainActor public func authenticate(requestScopes: [ASAuthorization.Scope] = [.email, .fullName]) async throws -> AppleAuthenticationResponse {
+    public func authenticate(requestScopes: [ASAuthorization.Scope] = [.email, .fullName]) async throws -> AppleAuthenticationResponse {
         
         let persistentStore: AppleUserPersistentStore = self.appleUserPersistentStore
         
-        return try await withCheckedThrowingContinuation { continuation in
-            
-            appleAuthorization.authenticate(requestScopes: requestScopes) { (result: Result<AppleAuthenticationResponse, Error>) in
-                
-                switch result {
-                case .success(let response):
-                    
-                    if let userId = response.userId {
-                        
-                        persistentStore.storeUserInfo(
-                            email: response.email,
-                            familyName: response.fullName?.familyName,
-                            givenName: response.fullName?.givenName
-                        )
-                        
-                        let status: OSStatus = persistentStore.storeUserId(
-                            userId: userId
-                        )
-                        
-                        let responseWithStatus = response.copy(persistUserIdStatus: status)
-                        
-                        continuation.resume(returning: responseWithStatus)
-                    }
-                    else {
-                        
-                        continuation.resume(returning: response)
-                    }
-
-                    
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
+        let response = try await appleAuthorization.authenticate(requestScopes: requestScopes)
+        
+        guard let userId = response.userId else {
+            return response
         }
+        
+        await persistentStore.storeUserInfo(
+            email: response.email,
+            familyName: response.fullName?.familyName,
+            givenName: response.fullName?.givenName
+        )
+        
+        let status: OSStatus = persistentStore.storeUserId(
+            userId: userId
+        )
+        
+        let responseWithStatus = response.copy(persistUserIdStatus: status)
+        
+        return responseWithStatus
     }
     
-    public func signOut() -> OSStatus {
+    public func signOut() async -> OSStatus {
         
-        return appleUserPersistentStore.deletePersistedUser()
+        return await appleUserPersistentStore.deletePersistedUser()
     }
 }

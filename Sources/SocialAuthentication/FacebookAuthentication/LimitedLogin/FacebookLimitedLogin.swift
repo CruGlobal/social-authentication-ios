@@ -9,6 +9,7 @@
 import UIKit
 import FBSDKLoginKit
 
+@MainActor
 public final class FacebookLimitedLogin {
     
     private let loginManager: LoginManager = LoginManager()
@@ -29,7 +30,7 @@ public final class FacebookLimitedLogin {
         return AuthenticationToken.current?.tokenString
     }
     
-    @MainActor public func authenticate(from viewController: UIViewController) async throws -> FacebookLimitedLoginResponse {
+    public func authenticate(from viewController: UIViewController) async throws -> FacebookLimitedLoginResponse {
         
         let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
         

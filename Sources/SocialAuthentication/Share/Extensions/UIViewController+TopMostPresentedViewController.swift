@@ -8,9 +8,9 @@
 
 import UIKit
 
-@MainActor extension UIViewController {
+extension UIViewController {
     
-    public func getTopMostPresentedViewController() -> UIViewController? {
+    @MainActor public func getTopMostPresentedViewController() -> UIViewController? {
         
         var nextTopMostPresentedViewController: UIViewController? = self
         var topMostPresentedViewController: UIViewController?
