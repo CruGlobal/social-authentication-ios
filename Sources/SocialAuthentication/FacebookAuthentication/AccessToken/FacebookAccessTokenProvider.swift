@@ -14,7 +14,7 @@ import Combine
 @MainActor
 public final class FacebookAccessTokenProvider: NSObject {
     
-    private let loginManager: LoginManager = LoginManager()
+    private let facebookLogin: FacebookLogin = FacebookLogin()
     private let configuration: FacebookAccessTokenProviderConfiguration
     private let accessTokenChanged: CurrentValueSubject<String?, Never>
         
@@ -37,11 +37,7 @@ public final class FacebookAccessTokenProvider: NSObject {
         
         NotificationCenter.default.removeObserver(self, name: .AccessTokenDidChange, object: nil)
     }
-    
-    public func getLoginManager() -> LoginManager {
-        return loginManager
-    }
-    
+
     private var trackingIsAuthorized: Bool {
         
         switch ATTrackingManager.trackingAuthorizationStatus {
@@ -139,11 +135,6 @@ public final class FacebookAccessTokenProvider: NSObject {
         
         let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
         
-        let loginConfiguration = LoginConfiguration(
-            permissions: configuration.permissions,
-            tracking: .enabled
-        )
-        
         let status: ATTrackingManager.AuthorizationStatus = await requestTrackingAuthorization()
         
         guard status == .authorized else {
@@ -155,36 +146,14 @@ public final class FacebookAccessTokenProvider: NSObject {
             throw error
         }
         
-        return try await withCheckedThrowingContinuation { continuation in
-            
-            loginManager.logIn(viewController: authenticateFromViewController, configuration: loginConfiguration) { (result: LoginResult)  in
-                
-                switch result {
-                
-                case .success( _, _, let token):
-                    
-                    let accessToken: String? = token?.tokenString
-                    let userId: String? = AccessToken.current?.userID
-
-                    let response = FacebookAccessTokenProviderResponse(accessToken: accessToken, isCancelled: false, userId: userId)
-                    
-                    continuation.resume(returning: response)
-                
-                case .cancelled:
-                    
-                    let response = FacebookAccessTokenProviderResponse(accessToken: nil, isCancelled: true, userId: nil)
-                    
-                    continuation.resume(returning: response)
-                
-                case .failed(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        return try await facebookLogin.performAccessTokenLogin(
+            viewController: authenticateFromViewController,
+            permissions: configuration.permissions
+        )
     }
     
-    public func signOut() {
+    public func signOut() async {
         
-        loginManager.logOut()
+        await facebookLogin.signOut()
     }
 }

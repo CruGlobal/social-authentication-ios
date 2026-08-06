@@ -12,7 +12,7 @@ import FBSDKLoginKit
 @MainActor
 public final class FacebookLimitedLogin {
     
-    private let loginManager: LoginManager = LoginManager()
+    private let facebookLogin: FacebookLogin = FacebookLogin()
     private let configuration: FacebookLimitedLoginConfiguration
         
     public init(configuration: FacebookLimitedLoginConfiguration) {
@@ -34,41 +34,14 @@ public final class FacebookLimitedLogin {
         
         let authenticateFromViewController: UIViewController = viewController.getTopMostPresentedViewController() ?? viewController
         
-        let loginConfiguration = LoginConfiguration(
-            permissions: configuration.permissions,
-            tracking: .limited
+        return try await facebookLogin.performLimitedLogin(
+            viewController: authenticateFromViewController,
+            permissions: configuration.permissions
         )
-        
-        // TODO: Remove withCheckedThrowingContinuation once FacebookSDK provides a login with async await. ~Levi
-        
-        return try await withCheckedThrowingContinuation { continuation in
-            
-            loginManager.logIn(viewController: authenticateFromViewController, configuration: loginConfiguration) { (result: LoginResult)  in
-                
-                switch result {
-                
-                case .success( _, _, _):
-                    
-                    let oidcToken: String? = AuthenticationToken.current?.tokenString
-                    let nonce: String? = AuthenticationToken.current?.nonce
-
-                    let response = FacebookLimitedLoginResponse(oidcToken: oidcToken, nonce: nonce, isCancelled: false)
-                    continuation.resume(returning: response)
-                
-                case .cancelled:
-                    
-                    let response = FacebookLimitedLoginResponse(oidcToken: nil, nonce: nil, isCancelled: true)
-                    continuation.resume(returning: response)
-                
-                case .failed(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
     }
     
-    public func signOut() {
+    public func signOut() async {
         
-        loginManager.logOut()
+        await facebookLogin.signOut()
     }
 }
