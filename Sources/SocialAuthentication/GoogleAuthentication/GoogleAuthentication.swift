@@ -41,7 +41,9 @@ public final class GoogleAuthentication: Sendable {
         return getCurrentUser()?.profile
     }
     
-    @MainActor public func authenticate(from viewController: UIViewController) async throws -> GoogleAuthenticationResponse {
+    @MainActor public func authenticate(
+        from viewController: UIViewController
+    ) async throws -> GoogleAuthenticationResponse {
         
         let result: GIDSignInResult = try await sharedGoogleSignIn.signIn(withPresenting: viewController, hint: nil, additionalScopes: nil)
         

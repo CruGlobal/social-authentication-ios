@@ -9,10 +9,8 @@
 import Foundation
 import AuthenticationServices
 
-@MainActor
-public final class AppleAuthentication {
+public final class AppleAuthentication: Sendable {
     
-    private let appleAuthorization: AppleAuthorization = AppleAuthorization()
     private let appleUserPersistentStore: AppleUserPersistentStore
     
     public init(
@@ -51,8 +49,12 @@ public final class AppleAuthentication {
         return authState
     }
 
-    public func authenticate(requestScopes: [ASAuthorization.Scope] = [.email, .fullName]) async throws -> AppleAuthenticationResponse {
-                
+    @MainActor public func authenticate(
+        requestScopes: [ASAuthorization.Scope] = [.email, .fullName]
+    ) async throws -> AppleAuthenticationResponse {
+              
+        let appleAuthorization = AppleAuthorization()
+        
         let response = try await appleAuthorization.authenticate(requestScopes: requestScopes)
         
         guard let userId = response.userId else {

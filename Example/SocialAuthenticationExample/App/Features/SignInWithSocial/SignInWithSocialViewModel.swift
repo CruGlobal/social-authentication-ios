@@ -7,7 +7,6 @@
 
 import UIKit
 import SocialAuthentication
-import Combine
 
 @MainActor
 final class SignInWithSocialViewModel: ObservableObject {
@@ -17,9 +16,7 @@ final class SignInWithSocialViewModel: ObservableObject {
     private let facebookLimitedLogin: FacebookLimitedLogin
     private let appleAuthentication: AppleAuthentication
     private let googleAuthentication: GoogleAuthentication
-    
-    private var cancellables: Set<AnyCancellable> = Set()
-    
+        
     @Published private(set) var facebookHasPersistedAccessToken: Bool = false
     @Published private(set) var appleIsAuthenticated: Bool = false
     @Published private(set) var googleIsAuthenticated: Bool = false
@@ -39,14 +36,12 @@ final class SignInWithSocialViewModel: ObservableObject {
         self.appleAuthentication = appleAuthentication
         self.googleAuthentication = googleAuthentication
         
-        facebookAccessTokenProvider.accessTokenChangedPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] (accessToken: String?) in
-                
-                let accessTokenExists: Bool = !(accessToken ?? "").isEmpty
-                self?.facebookHasPersistedAccessToken = accessTokenExists
-            }
-            .store(in: &cancellables)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(accessTokenDidChange(notification:)),
+            name: .AccessTokenDidChange,
+            object: nil
+        )
         
         Task {
             appleIsAuthenticated = try await appleAuthentication.getIsAuthenticated()
@@ -55,6 +50,21 @@ final class SignInWithSocialViewModel: ObservableObject {
         Task {
             let response = try await googleAuthentication.restorePreviousSignIn()
             googleIsAuthenticated = response.idToken != nil
+        }
+    }
+    
+    deinit {
+        
+        NotificationCenter.default.removeObserver(self, name: .AccessTokenDidChange, object: nil)
+    }
+    
+    @objc private func accessTokenDidChange(notification: Notification) {
+        
+        if notification.name == .AccessTokenDidChange {
+            
+            let accessToken: String? = facebookAccessTokenProvider.getAccessTokenString()
+            let accessTokenExists: Bool = !(accessToken ?? "").isEmpty
+            facebookHasPersistedAccessToken = accessTokenExists
         }
     }
 }
