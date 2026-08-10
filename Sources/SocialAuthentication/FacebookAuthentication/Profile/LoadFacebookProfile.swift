@@ -19,7 +19,7 @@ public final class LoadFacebookProfile: Sendable {
         return Profile.current?.toFacebookProfile()
     }
     
-    @MainActor public func loadProfile() async throws -> FacebookProfile? {
+    public func loadProfile() async throws -> FacebookProfile? {
         
         return try await withCheckedThrowingContinuation { continuation in
             

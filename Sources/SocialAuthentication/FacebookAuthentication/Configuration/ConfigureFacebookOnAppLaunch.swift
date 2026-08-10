@@ -9,8 +9,7 @@
 import UIKit
 import FBSDKCoreKit
 
-@MainActor
-public final class ConfigureFacebookOnAppLaunch {
+public final class ConfigureFacebookOnAppLaunch: Sendable {
     
     public static func configure(
         application: UIApplication,

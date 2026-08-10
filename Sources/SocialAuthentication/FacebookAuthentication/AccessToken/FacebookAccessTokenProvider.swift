@@ -9,33 +9,15 @@
 import UIKit
 import FBSDKLoginKit
 import AppTrackingTransparency
-import Combine
 
-@MainActor
-public final class FacebookAccessTokenProvider: NSObject {
+public final class FacebookAccessTokenProvider: Sendable {
     
     private let facebookLogin: FacebookLogin = FacebookLogin()
     private let configuration: FacebookAccessTokenProviderConfiguration
-    private let accessTokenChanged: CurrentValueSubject<String?, Never>
         
     public init(configuration: FacebookAccessTokenProviderConfiguration) {
         
         self.configuration = configuration
-        self.accessTokenChanged = CurrentValueSubject(AccessToken.current?.tokenString)
-        
-        super.init()
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(accessTokenDidChange(notification:)),
-            name: .AccessTokenDidChange,
-            object: nil
-        )
-    }
-    
-    deinit {
-        
-        NotificationCenter.default.removeObserver(self, name: .AccessTokenDidChange, object: nil)
     }
 
     private var trackingIsAuthorized: Bool {
@@ -68,16 +50,6 @@ public final class FacebookAccessTokenProvider: NSObject {
         default:
             return "unknown status"
         }
-    }
-    
-    public var accessTokenChangedPublisher: AnyPublisher<String?, Never> {
-        return accessTokenChanged
-            .eraseToAnyPublisher()
-    }
-    
-    @objc private func accessTokenDidChange(notification: Notification) {
-                
-        accessTokenChanged.send(AccessToken.current?.tokenString)
     }
     
     public func getAccessToken() -> AccessToken? {
@@ -129,7 +101,7 @@ public final class FacebookAccessTokenProvider: NSObject {
         }
     }
     
-    public func authenticate(
+    @MainActor public func authenticate(
         from viewController: UIViewController
     ) async throws -> FacebookAccessTokenProviderResponse {
         
